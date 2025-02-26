@@ -174,7 +174,7 @@ export default function CreditPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Select Company</label>
             <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.company}
               onChange={(e) => setFormData({ ...formData, company: e.target.value })}
               required
@@ -193,7 +193,7 @@ export default function CreditPage() {
           <div>
             <label className="block text-sm font-medium mb-1">Select Number</label>
             <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.selectedAccount}
               onChange={(e) => handleNumberSelection(e.target.value)}
               required
@@ -252,7 +252,7 @@ export default function CreditPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Entry By</label>
           <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.entryBy}
               onChange={(e) => setFormData({ ...formData, entryBy: e.target.value })}
               required

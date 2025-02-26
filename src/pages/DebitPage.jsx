@@ -37,6 +37,7 @@ export default function DebitPage() {
     fetchCompanyDetails();
   }, [formData.company]);
   const handleNumberSelection = (selectedMobile) => {
+    // setSelectedAmount()
     const selectedAccount = companyData.find((item) => item.mobileNumber === selectedMobile);
     if (selectedAccount) {
       setFormData((prev) => ({
@@ -81,7 +82,7 @@ export default function DebitPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Select Company</label>
           <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.company}
               onChange={(e) => setFormData({ ...formData, company: e.target.value })}
               required
@@ -100,7 +101,7 @@ export default function DebitPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Select Number</label>
           <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.selectedAccount}
               onChange={(e) => handleNumberSelection(e.target.value)}
               required
@@ -127,7 +128,16 @@ export default function DebitPage() {
             />
             
             </div>
-            <div className="text-sm text-gray-500 mt-1">Total :{0>(Number(selectedAmount)- Number(formData.amount))?<span className="text-red-600">{Number(selectedAmount)- Number(formData.amount)}</span>:<span className="text-green-500">{Number(selectedAmount)- Number(formData.amount)}</span>}</div>
+            <div className="text-sm text-gray-500 mt-1">
+  Total :
+  {isNaN(Number(selectedAmount)) || isNaN(Number(formData.amount)) || selectedAmount === "" || formData.amount === "" 
+    ? "" 
+    : (Number(selectedAmount) - Number(formData.amount)) < 0 
+      ? <span className="text-red-600">{Number(selectedAmount) - Number(formData.amount)}</span>
+      : <span className="text-green-500">{Number(selectedAmount) - Number(formData.amount)}</span>
+  }
+</div>
+
           </div>
 
           <div>
@@ -169,7 +179,7 @@ export default function DebitPage() {
         <div>
           <label className="block text-sm font-medium mb-1">Entry By</label>
           <select
-              className="w-full border rounded-md p-2"
+              className="w-full border rounded-md p-2 bg-white"
               value={formData.entryBy}
               onChange={(e) => setFormData({ ...formData, entryBy: e.target.value })}
               required
@@ -192,14 +202,13 @@ export default function DebitPage() {
           </Link>
           
           {0 > (Number(selectedAmount) - Number(formData.amount)) ? (
-  <button type="submit"disabled className="bg-emerald-200 text-white px-6 py-2 rounded-md ">
+  <button type="submit"disabled className="bg-emerald-200 text-white px-6 py-2 rounded-md cursor-not-allowed">
     Submit
   </button>
 ) : (
   <button
     type="submit"
-    
-    className="bg-emerald-500 text-white px-6 py-2 rounded-md cursor-not-allowed"
+    className="bg-emerald-500 text-white px-6 py-2 rounded-md"
   >
     Submit
   </button>
