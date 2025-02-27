@@ -11,7 +11,7 @@ export default function CreditPage() {
     selectedNumber: "",
     newAmount: 0,
     remarks: "",
-    entryBy: "aditto",
+    entryBy: "Rajib",
     statement: "",
   });
 
@@ -116,7 +116,7 @@ export default function CreditPage() {
         selectedNumber: "",
         newAmount: 0,
         remarks: "",
-        entryBy: "aditto",
+        entryBy: "Rajib",
         statement: "",
       });
       setCompanyData([]); // Clear company data
@@ -128,8 +128,8 @@ export default function CreditPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold text-center mb-8">Daily Transaction Register</h1>
-      <div className="text-emerald-500 font-bold text-xl mb-6">Credit</div>
+      <h1 className="text-3xl font-bold text-center mb-8">Credit</h1>
+      {/* <div className="text-emerald-500 font-bold text-xl mb-6">Credit</div> */}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
@@ -257,8 +257,8 @@ export default function CreditPage() {
               onChange={(e) => setFormData({ ...formData, entryBy: e.target.value })}
               required
             >
-              <option value="aditto">Aditto</option>
-              <option value="ahad">Ahad</option>
+              <option value="Rajib">Rajib</option>
+              <option value="Rony">Rony</option>
             </select>
           {/* <input
             type="text"

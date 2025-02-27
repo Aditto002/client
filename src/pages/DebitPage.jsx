@@ -9,7 +9,7 @@ export default function DebitPage() {
     amount: 0,
     remarks: "",
     statement:"",
-    entryBy: "aditto",
+    entryBy: "Rajib",
   })
   useEffect(() => {
     const fetchCompanyDetails = async () => {
@@ -64,7 +64,7 @@ export default function DebitPage() {
         amount: 0,
         remarks: "",
         statement:"",
-        entryBy: "aditto",
+        entryBy: "Rajib",
       });
       setCompanyData([]); // Clear company data
     } catch (error) {
@@ -75,8 +75,8 @@ export default function DebitPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold text-center mb-8">Daily Transaction Register</h1>
-      <div className="text-emerald-500 font-bold text-xl mb-6">Debit</div>
+      <h1 className="text-3xl font-bold text-center mb-8">Debit</h1>
+      {/* <div className="text-emerald-500 font-bold text-xl mb-6">Debit</div> */}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -184,8 +184,8 @@ export default function DebitPage() {
               onChange={(e) => setFormData({ ...formData, entryBy: e.target.value })}
               required
             >
-              <option value="aditto">Aditto</option>
-              <option value="ahad">Ahad</option>
+              <option value="Rajib">Rajib</option>
+              <option value="Rony">Rony</option>
             </select>
           {/* <input
             type="text"

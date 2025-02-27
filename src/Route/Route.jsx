@@ -4,6 +4,10 @@ import CreditPage from '../pages/CreaditPage'
 import DebitPage from '../pages/DebitPage'
 import DuePage from '../pages/DuePage'
 import DailyTransation from '../pages/DailyTransaction'
+import Balance from '../pages/Balance'
+import DailyLog from '../pages/DailyLog'
+import Customer from '../pages/Customer'
+import Account from '../pages/Account'
 const router = createBrowserRouter([
   {
     path:'/',
@@ -24,7 +28,23 @@ const router = createBrowserRouter([
   {
     path: '/dailytransation',
     element :<DailyTransation></DailyTransation>
-  }
+  },
+  {
+    path: '/balance',
+    element :<Balance></Balance>
+  },
+  {
+    path: '/dailylog',
+    element :<DailyLog></DailyLog>
+  },
+  {
+    path: '/customer',
+    element :<Customer></Customer>
+  },
+  {
+    path: '/account',
+    element :<Account></Account>
+  },
 
   
 ])
