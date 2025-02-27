@@ -257,7 +257,7 @@ const DailyTransaction = () => {
     </div>
 
     {/* Buttons */}
-    <div className="flex items-center ml-96 gap-4">
+    <div className="flex items-center md:ml-96 gap-4">
       <button onClick={handleApplyFilters} className="bg-green-500 text-white py-2 px-5 rounded-lg">
         Apply
       </button>
