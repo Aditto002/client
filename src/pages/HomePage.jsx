@@ -7,7 +7,7 @@ export default function HomePage() {
     { title: 'DUE', path: '/duepage' },
     { title: 'Add Customer', path: '/add-customer' },
     { title: 'Add Account Number', path: '/add-account' },
-    { title: 'Daily Transaction Register', path: '/transactions' },
+    { title: 'Daily Transaction Register', path: '/dailytransation' },
     { title: 'Edit And Delete Entry', path: '/edit' },
     { title: 'Daily Log', path: '/log' },
     { title: 'Total Balance', path: '/balance' },

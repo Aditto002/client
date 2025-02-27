@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage'
 import CreditPage from '../pages/CreaditPage'
 import DebitPage from '../pages/DebitPage'
 import DuePage from '../pages/DuePage'
+import DailyTransation from '../pages/DailyTransaction'
 const router = createBrowserRouter([
   {
     path:'/',
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   path:'/duepage',
   element:<DuePage></DuePage>
   },
+  {
+    path: '/dailytransation',
+    element :<DailyTransation></DailyTransation>
+  }
 
   
 ])
