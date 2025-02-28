@@ -84,7 +84,7 @@ const MobileAccounts = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("http://localhost:5000/api/mobileAccounts", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
         params: params,
       })
       setTransactions(response.data.data.accounts)
@@ -107,7 +107,7 @@ const MobileAccounts = () => {
       // Only add search parameter if it has a value
       if (searchQuery) params.search = searchQuery
 
-      const response = await axios.get("http://localhost:5000/api/mobileAccounts/account-datas", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts/account-datas", {
         params: params,
       })
 
@@ -152,7 +152,7 @@ const MobileAccounts = () => {
       setIsSubmitting(true)
       setError("")
       
-      const response = await axios.post("http://localhost:5000/api/mobileAccounts", {
+      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
         selectCompany,
         mobileNumber
       })
@@ -201,7 +201,7 @@ const MobileAccounts = () => {
       setIsUpdating(true)
       setUpdateError("")
       
-      const response = await axios.put(`http://localhost:5000/api/mobileAccounts/${updateAccountId}`, {
+      const response = await axios.put(`https://bebsa.ahadalichowdhury.online/api/mobileAccounts/${updateAccountId}`, {
         selectCompany: updateSelectCompany,
         mobileNumber: updateMobileNumber
       })
@@ -237,7 +237,7 @@ const MobileAccounts = () => {
     try {
       setIsDeleting(true)
       
-      await axios.delete(`http://localhost:5000/api/mobileAccounts/${deleteAccountId}`)
+      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/mobileAccounts/${deleteAccountId}`)
       
       console.log("Account deleted successfully")
       

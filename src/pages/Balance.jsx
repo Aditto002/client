@@ -60,7 +60,7 @@ const Balance = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("http://localhost:5000/api/mobileAccounts", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
         params: params,
       })
       setTransactions(response.data.data.accounts)
@@ -81,7 +81,7 @@ const Balance = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("http://localhost:5000/api/mobileAccounts/download-pdf", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts/download-pdf", {
         params: params,
       })
       setPDFData(response.data.data.accounts)
@@ -140,7 +140,7 @@ const Balance = () => {
         return;
       }
       
-      await axios.put(`http://localhost:5000/api/debit/${updateData._id}`, updateData)
+      await axios.put(`https://bebsa.ahadalichowdhury.online/api/debit/${updateData._id}`, updateData)
       setShowUpdateModal(false)
       fetchTransactions() // Refresh the data
       alert("Record updated successfully")
@@ -172,7 +172,7 @@ const Balance = () => {
         return;
       }
       
-      await axios.delete(`http://localhost:5000/api/debit/${deleteId}`)
+      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/debit/${deleteId}`)
       setShowDeleteConfirm(false)
       fetchTransactions() // Refresh the data
       alert("Record deleted successfully")
@@ -339,7 +339,7 @@ const Balance = () => {
                 <th className="text-left py-4 px-6 text-gray-500 font-medium ">Company</th>
                 <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Amount</th>
                 <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Account Number</th>
-                <th className="text-left py-4 px-6 text-gray-500 font-medium ">Action</th>
+                {/* <th className="text-left py-4 px-6 text-gray-500 font-medium ">Action</th> */}
               </tr>
             </thead>
             <tbody>
@@ -358,7 +358,7 @@ const Balance = () => {
                   <td className="py-4 px-6 text-gray-700 text-center">{transaction.totalAmount}</td>
                   <td className="py-4 px-6 text-gray-700 text-center">{transaction.mobileNumber}</td>
                   <td className="py-4 px-6">
-                    {transaction.isYourAccount ? (
+                    {/* {transaction.isYourAccount ? (
                       <button className="px-4 py-2 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 transition-colors">
                         Your Account
                       </button>
@@ -377,7 +377,7 @@ const Balance = () => {
                           <FiTrash size={18} />
                         </button>
                       </div>
-                    )}
+                    )} */}
                   </td>
                 </tr>
               ))}

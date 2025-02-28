@@ -71,7 +71,7 @@ const DailyTransaction = () => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      const response = await axios.get("http://localhost:5000/api/credit/personal", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/credit/personal", {
         params: params,
       });
       
@@ -106,7 +106,7 @@ const DailyTransaction = () => {
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
-      const response = await axios.get("http://localhost:5000/api/credit/download-pdf", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/credit/download-pdf", {
         params: params,
       });
       
@@ -276,7 +276,7 @@ const DailyTransaction = () => {
       }
       
       // Use the _id in the API endpoint
-      await axios.put(`http://localhost:5000/api/credit/${updateData._id}`, updateData);
+      await axios.put(`https://bebsa.ahadalichowdhury.online/api/credit/${updateData._id}`, updateData);
       setIsUpdateModalOpen(false);
       fetchTransactions(); // Refresh data after update
       alert("Transaction updated successfully");
@@ -309,7 +309,7 @@ const DailyTransaction = () => {
         throw new Error("Transaction ID is missing");
       }
       
-      await axios.delete(`http://localhost:5000/api/credit/${deleteId}`);
+      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`);
       setIsDeleteConfirmOpen(false);
       fetchTransactions(); // Refresh data after delete
       alert("Transaction deleted successfully");

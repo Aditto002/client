@@ -81,7 +81,7 @@ const Customer = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("http://localhost:5000/api/mobileAccounts", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
         params: params,
       })
       setTransactions(response.data.data.accounts)
@@ -104,7 +104,7 @@ const Customer = () => {
       // Only add search parameter if it has a value
       if (searchQuery) params.search = searchQuery
 
-      const response = await axios.get("http://localhost:5000/api/customers", {
+      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/customers", {
         params: params,
       })
 
@@ -149,7 +149,7 @@ const Customer = () => {
       setIsSubmitting(true)
       setError("")
       
-      const response = await axios.post("http://localhost:5000/api/customers", {
+      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/customers", {
         customerName,
         mobileNumber
       })
@@ -198,7 +198,7 @@ const Customer = () => {
       setIsUpdating(true)
       setUpdateError("")
       
-      const response = await axios.put(`http://localhost:5000/api/customers/${updateCustomerId}`, {
+      const response = await axios.put(`https://bebsa.ahadalichowdhury.online/api/customers/${updateCustomerId}`, {
         customerName: updateCustomerName,
         mobileNumber: updateMobileNumber
       })
@@ -234,7 +234,7 @@ const Customer = () => {
     try {
       setIsDeleting(true)
       
-      await axios.delete(`http://localhost:5000/api/customers/${deleteCustomerId}`)
+      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/customers/${deleteCustomerId}`)
       
       console.log("Customer deleted successfully")
       

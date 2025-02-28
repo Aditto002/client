@@ -27,7 +27,7 @@ export default function CreditPage() {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(formData.company)}`
+          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(formData.company)}`
         );
 
         if (response.data.success) {
@@ -69,7 +69,7 @@ export default function CreditPage() {
     }
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/customers/search?customer=${name}`);
+      const response = await axios.get(`https://bebsa.ahadalichowdhury.online/api/customers/search?customer=${name}`);
 
       if (response.data.success) {
         setCustomerSuggestions(response.data.data);
@@ -102,8 +102,8 @@ export default function CreditPage() {
 
 
     try {
-      console.log(formData)
-      const response = await axios.post("http://localhost:5000/api/credit", formData);
+      // console.log("Api",import.meta.env.API_URL)
+      const response = await axios.post(`https://bebsa.ahadalichowdhury.online/api/credit`, formData);
       console.log("Success:", response.data);
       alert("Transaction submitted successfully!");
 

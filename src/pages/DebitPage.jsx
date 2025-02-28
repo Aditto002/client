@@ -17,7 +17,7 @@ export default function DebitPage() {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(formData.company)}`
+          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(formData.company)}`
         );
 
         if (response.data.success) {
@@ -54,7 +54,7 @@ export default function DebitPage() {
     console.log(formData)
     try {
       console.log(formData)
-      const response = await axios.post("http://localhost:5000/api/debit", formData);
+      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/debit", formData);
       console.log("Success:", response.data);
       alert("submitted successfully!");
 
@@ -196,7 +196,7 @@ export default function DebitPage() {
           <div className="text-sm text-gray-500 mt-1">2 (Jon er Nam)</div>
         </div>
 
-        <div className="flex justify-between pt-4">
+        <div className="flex justify-between pt-4 mb-10">
           <Link to="/" className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600">
             Back
           </Link>
@@ -216,7 +216,7 @@ export default function DebitPage() {
         </div>
       </form>
 
-      <div className="text-center text-3xl text-red-500 font-bold mt-8">Demo Page-2</div>
+      {/* <div className="text-center text-3xl text-red-500 font-bold mt-8">Demo Page-2</div> */}
     </div>
   )
 }

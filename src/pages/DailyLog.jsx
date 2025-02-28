@@ -21,7 +21,7 @@ const DailyLog = () => {
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/mobileAccounts/today-log",
+        "https://bebsa.ahadalichowdhury.online/api/mobileAccounts/today-log",
         {
           params: {
             page: currentPage,
