@@ -1,3 +1,13 @@
 {
-    "buildCommand": "npm install --legacy-peer-deps && vite build"
+    "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "buildCommand": "npm install --legacy-peer-deps && npm run build",
+                "outputDirectory": "dist"
+            }
+        }
+    ]
 }
