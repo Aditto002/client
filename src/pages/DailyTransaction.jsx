@@ -9,7 +9,8 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiDownload,
-  FiX
+  FiX,
+  FiLoader // Added loader icon
 } from "react-icons/fi";
 // Import jsPDF correctly
 import { jsPDF } from "jspdf";
@@ -27,7 +28,7 @@ const DailyTransaction = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [search, setSearch] = useState("");  // Changed from 0 to empty string for search
+  const [search, setSearch] = useState("");
   const [entryBy, setEntryBy] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -35,6 +36,10 @@ const DailyTransaction = () => {
   const [tempEntryBy, setTempEntryBy] = useState("");
   const [tempStartDate, setTempStartDate] = useState("");
   const [tempEndDate, setTempEndDate] = useState("");
+  
+  // Add loading states
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
   
   // States for update modal
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -59,6 +64,7 @@ const DailyTransaction = () => {
   }, [currentPage, search, entryBy, startDate, endDate]);
 
   const fetchTransactions = async () => {
+    setIsLoading(true); // Start loading
     try {
       // Prepare params object, only including dates if they have values
       const params = {
@@ -91,10 +97,13 @@ const DailyTransaction = () => {
       setTransactions([]);
       setTotalAmount({totalAmount: 0});
       setTotalPages(1);
+    } finally {
+      setIsLoading(false); // End loading regardless of outcome
     }
   };
   
   const fetchPDF = async () => {
+    setIsPdfLoading(true); // Start PDF loading
     try {
       // Prepare params object, only including dates if they have values
       const params = {
@@ -119,6 +128,8 @@ const DailyTransaction = () => {
     } catch (error) {
       console.error("Error fetching PDF data:", error);
       setPDFData([]);
+    } finally {
+      setIsPdfLoading(false); // End PDF loading regardless of outcome
     }
   };
   
@@ -319,6 +330,13 @@ const DailyTransaction = () => {
     }
   };
 
+  // Loading Spinner Component
+  const LoadingSpinner = () => (
+    <div className="flex justify-center items-center py-10">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="text-center mb-10 mt-10">
@@ -376,15 +394,29 @@ const DailyTransaction = () => {
 
           {/* Buttons */}
           <div className="flex items-center md:ml-96 gap-4">
-            <button onClick={handleApplyFilters} className="bg-green-500 text-white py-2 px-5 rounded-lg">
-              Apply
+            <button 
+              onClick={handleApplyFilters} 
+              className="bg-green-500 text-white py-2 px-5 rounded-lg"
+              disabled={isLoading}
+            >
+              {isLoading ? "Applying..." : "Apply"}
             </button>
 
             <button 
               onClick={downloadTransactionsPDF} 
               className="bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center gap-2"
+              disabled={isPdfLoading || isLoading}
             >
-              <FiDownload size={14} /> Download PDF
+              {isPdfLoading ? (
+                <span className="flex items-center">
+                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
+                  Loading...
+                </span>
+              ) : (
+                <>
+                  <FiDownload size={14} /> Download PDF
+                </>
+              )}
             </button>
           </div>
         <div className="ml-auto text-lg font-semibold">
@@ -394,194 +426,201 @@ const DailyTransaction = () => {
         {/* Total Amount */}
       </div>
 
-      {/* Desktop View */}
-      <div className="hidden md:block overflow-x-auto mt-6">
-        <table className="w-full whitespace-nowrap">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Customer Name</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Amount</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Customer Number</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Own Number</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Balance</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Remarks</th>
-              <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions && transactions.length > 0 ? (
-              transactions.map((transaction, index) => (
-                <tr
-                  key={transaction._id || index}
-                  className={`border-b border-gray-200 ${index % 2 === 1 ? "bg-gray-50" : "bg-white"}`}
-                >
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
-                        <FiUser size={18} />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900 text-center">{transaction.customerName || 'N/A'}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6 text-gray-700 text-center">{transaction.newAmount || 0}</td>
-                  <td className="py-4 px-6 text-gray-700 text-center">{transaction.customerNumber || 'N/A'}</td>
-                  <td className="py-4 px-6">
-                    <span className="px-3 py-1 bg-gray-100 text-center text-gray-800 rounded text-sm font-medium">
-                      {transaction.selectedAccount || 'N/A'}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6 text-gray-700 text-center">{transaction.selectedNumber || 'N/A'}</td>
-                  <td className="py-4 px-6 text-center">
-                    <span className="px-3 py-1 rounded text-sm font-medium">
-                      {transaction.remarks || 'N/A'}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    {transaction.isYourAccount ? (
-                      <button className="px-4 py-2 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 transition-colors">
-                        Your Account
-                      </button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button 
-                          className="text-gray-500 hover:text-gray-700"
-                          onClick={() => handleOpenUpdateModal(transaction)}
-                        >
-                          <FiEdit size={18} />
-                        </button>
-                        <button 
-                          className="text-gray-500 hover:text-gray-700"
-                          onClick={() => handleOpenDeleteConfirm(transaction._id)}
-                        >
-                          <FiTrash size={18} />
-                        </button>
-                      </div>
-                    )}
-                  </td>
+      {/* Loading indicator for main data */}
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          {/* Desktop View */}
+          <div className="hidden md:block overflow-x-auto mt-6">
+            <table className="w-full whitespace-nowrap">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Customer Name</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Amount</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Customer Number</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Own Number</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Balance</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Remarks</th>
+                  <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">Action</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="py-6 text-center text-gray-500">No transactions found</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile View */}
-      <div className="md:hidden space-y-4 mt-6">
-        {transactions && transactions.length > 0 ? (
-          transactions.map((transaction, index) => (
-            <div key={transaction._id || index} className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 mt-1">
-                      <FiUser size={18} />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">{transaction.customerName || 'N/A'}</div>
-                      {transaction.newAmount && <div className="text-sm text-gray-500">{transaction.newAmount}</div>}
-                      {transaction.customerNumber && <div className="text-sm text-gray-500">{transaction.customerNumber}</div>}
-                      {transaction.selectedAccount && <div className="text-sm text-gray-500">{transaction.selectedAccount}</div>}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setExpandedRow(expandedRow === transaction._id ? null : transaction._id)}
-                    className="text-gray-500"
-                  >
-                    {expandedRow === transaction._id ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
-                  </button>
-                </div>
-
-                {expandedRow === transaction._id && (
-                  <div className="mt-4 space-y-3 pt-3 border-t border-gray-200">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Customer Name:</div>
-                      <div className="text-sm text-gray-900">{transaction.customerName || 'N/A'}</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Amount:</div>
-                      <div className="text-sm text-gray-900">{transaction.newAmount || 0}</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Customer Number:</div>
-                      <div>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded text-sm font-medium">
-                          {transaction.customerNumber || 'N/A'}
+              </thead>
+              <tbody>
+                {transactions && transactions.length > 0 ? (
+                  transactions.map((transaction, index) => (
+                    <tr
+                      key={transaction._id || index}
+                      className={`border-b border-gray-200 ${index % 2 === 1 ? "bg-gray-50" : "bg-white"}`}
+                    >
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
+                            <FiUser size={18} />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900 text-center">{transaction.customerName || 'N/A'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-gray-700 text-center">{transaction.newAmount || 0}</td>
+                      <td className="py-4 px-6 text-gray-700 text-center">{transaction.customerNumber || 'N/A'}</td>
+                      <td className="py-4 px-6">
+                        <span className="px-3 py-1 bg-gray-100 text-center text-gray-800 rounded text-sm font-medium">
+                          {transaction.selectedAccount || 'N/A'}
                         </span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Own Number:</div>
-                      <div className="text-sm text-gray-900">{transaction.selectedAccount || 'N/A'}</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Balance:</div>
-                      <div>
-                        <span className="px-3 py-1 rounded text-sm font-medium">
-                          {transaction.selectedNumber || 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Remarks:</div>
-                      <div>
+                      </td>
+                      <td className="py-4 px-6 text-gray-700 text-center">{transaction.selectedNumber || 'N/A'}</td>
+                      <td className="py-4 px-6 text-center">
                         <span className="px-3 py-1 rounded text-sm font-medium">
                           {transaction.remarks || 'N/A'}
                         </span>
-                      </div>
-                    </div>
-                    <div className="pt-3">
-                      <div className="flex justify-between">
-                        <button 
-                          className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
-                          onClick={() => handleOpenUpdateModal(transaction)}
-                        >
-                          <FiEdit size={18} />
-                        </button>
-                        <button 
-                          className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
-                          onClick={() => handleOpenDeleteConfirm(transaction._id)}
-                        >
-                          <FiTrash size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        {transaction.isYourAccount ? (
+                          <button className="px-4 py-2 bg-gray-900 text-white rounded font-medium hover:bg-gray-800 transition-colors">
+                            Your Account
+                          </button>
+                        ) : (
+                          <div className="flex gap-2">
+                            <button 
+                              className="text-gray-500 hover:text-gray-700"
+                              onClick={() => handleOpenUpdateModal(transaction)}
+                            >
+                              <FiEdit size={18} />
+                            </button>
+                            <button 
+                              className="text-gray-500 hover:text-gray-700"
+                              onClick={() => handleOpenDeleteConfirm(transaction._id)}
+                            >
+                              <FiTrash size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="py-6 text-center text-gray-500">No transactions found</td>
+                  </tr>
                 )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="text-center py-6 text-gray-500">No transactions found</div>
-        )}
-      </div>
+              </tbody>
+            </table>
+          </div>
 
-      {/* Pagination */}
-      {totalPages > 0 && (
-        <div className="mt-6 flex justify-center items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-          >
-            <FiChevronLeft />
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages || totalPages === 0}
-            className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-          >
-            <FiChevronRight />
-          </button>
-        </div>
+          {/* Mobile View */}
+          <div className="md:hidden space-y-4 mt-6">
+            {transactions && transactions.length > 0 ? (
+              transactions.map((transaction, index) => (
+                <div key={transaction._id || index} className="bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 mt-1">
+                          <FiUser size={18} />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">{transaction.customerName || 'N/A'}</div>
+                          {transaction.newAmount && <div className="text-sm text-gray-500">{transaction.newAmount}</div>}
+                          {transaction.customerNumber && <div className="text-sm text-gray-500">{transaction.customerNumber}</div>}
+                          {transaction.selectedAccount && <div className="text-sm text-gray-500">{transaction.selectedAccount}</div>}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setExpandedRow(expandedRow === transaction._id ? null : transaction._id)}
+                        className="text-gray-500"
+                      >
+                        {expandedRow === transaction._id ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
+                      </button>
+                    </div>
+
+                    {expandedRow === transaction._id && (
+                      <div className="mt-4 space-y-3 pt-3 border-t border-gray-200">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Customer Name:</div>
+                          <div className="text-sm text-gray-900">{transaction.customerName || 'N/A'}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Amount:</div>
+                          <div className="text-sm text-gray-900">{transaction.newAmount || 0}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Customer Number:</div>
+                          <div>
+                            <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded text-sm font-medium">
+                              {transaction.customerNumber || 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Own Number:</div>
+                          <div className="text-sm text-gray-900">{transaction.selectedAccount || 'N/A'}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Balance:</div>
+                          <div>
+                            <span className="px-3 py-1 rounded text-sm font-medium">
+                              {transaction.selectedNumber || 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-sm text-gray-500">Remarks:</div>
+                          <div>
+                            <span className="px-3 py-1 rounded text-sm font-medium">
+                              {transaction.remarks || 'N/A'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="pt-3">
+                          <div className="flex justify-between">
+                            <button 
+                              className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
+                              onClick={() => handleOpenUpdateModal(transaction)}
+                            >
+                              <FiEdit size={18} />
+                            </button>
+                            <button 
+                              className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
+                              onClick={() => handleOpenDeleteConfirm(transaction._id)}
+                            >
+                              <FiTrash size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-6 text-gray-500">No transactions found</div>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 0 && (
+            <div className="mt-6 flex justify-center items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || isLoading}
+                className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+              >
+                <FiChevronLeft />
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages || totalPages === 0 || isLoading}
+                className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+              >
+                <FiChevronRight />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Update Modal */}
@@ -701,7 +740,6 @@ const DailyTransaction = () => {
           </div>
         </div>
       )}
-
       {/* Delete Confirmation Dialog */}
       {isDeleteConfirmOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
