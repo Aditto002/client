@@ -285,7 +285,7 @@ const Balance = () => {
   return (
     <div className="container mx-auto p-4 max-w-5xl">
         <div className="text-center mb-10 mt-10">
-          <h1 className="text-4xl font-bold">Daily Transaction</h1>
+          <h1 className="text-4xl font-bold">Balance</h1>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6 md:mb-8">
@@ -323,11 +323,11 @@ const Balance = () => {
               >
                 <FiDownload size={14} /> Download PDF
               </button>
-            </div>
-            {/* Total Amount - Moved to the right */}
-            <div className="ml-auto text-lg font-semibold md:mt-10">
+            <div className="ml-auto text-lg font-semibold md:mt-5">
               <p>Total Amount: {totalAmount?.totalSum}</p>
             </div>
+            </div>
+            {/* Total Amount - Moved to the right */}
           </div>
         </div>
 

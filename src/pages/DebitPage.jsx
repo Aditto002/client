@@ -193,7 +193,7 @@ export default function DebitPage() {
             value={formData.entryBy}
             onChange={(e) => setFormData({ ...formData, entryBy: e.target.value })}
           /> */}
-          <div className="text-sm text-gray-500 mt-1">2 (Jon er Nam)</div>
+          {/* <div className="text-sm text-gray-500 mt-1">2 (Jon er Nam)</div> */}
         </div>
 
         <div className="flex justify-between pt-4 mb-10">

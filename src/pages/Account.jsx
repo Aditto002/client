@@ -62,7 +62,13 @@ const MobileAccounts = () => {
     const [isSearching, setIsSearching] = useState(false)
 
     // Company options
-    const companyOptions = ["Nagad Personal", "Bkash Personal", "Rocket Personal", "Upay Personal"]
+    const companyOptions = ['Bkash Personal',
+          'Bkash Agent',
+          'Nagad Personal',
+          'Nagad Agent',
+          'Rocket Personal',
+          'Rocket Agent',
+        'Others']
 
   useEffect(() => {
     fetchTransactions()
