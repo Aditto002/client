@@ -99,7 +99,7 @@ export default function CreditPage() {
     try {
       // First try to search by the input as provided (could be name or number)
       const response = await axios.get(
-        `http://localhost:5000/api/customers/search?customer=${encodeURIComponent(
+        `https://bebsa.ahadalichowdhury.online/api/customers/search?customer=${encodeURIComponent(
           searchInput
         )}`
       );
@@ -115,7 +115,7 @@ export default function CreditPage() {
         // Additional search for numbers only if the input contains only digits
         try {
           const numberResponse = await axios.get(
-            `http://localhost:5000/api/customers/search?mobileNumber=${encodeURIComponent(
+            `https://bebsa.ahadalichowdhury.online/api/customers/search?mobileNumber=${encodeURIComponent(
               searchInput
             )}`
           );

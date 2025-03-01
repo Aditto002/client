@@ -86,7 +86,7 @@ const StatementPage = () => {
 
       // Use the new API endpoint for account data
       const response = await axios.get(
-        "http://localhost:5000/api/credit/account-datas",
+        "https://bebsa.ahadalichowdhury.online/api/credit/account-datas",
         {
           params: params,
         }
@@ -123,7 +123,7 @@ const StatementPage = () => {
 
       // Use the same endpoint for PDF data for now
       const response = await axios.get(
-        "http://localhost:5000/api/credit/account-datas",
+        "https://bebsa.ahadalichowdhury.online/api/credit/account-datas",
         {
           params: params,
         }
@@ -187,7 +187,7 @@ const StatementPage = () => {
       }
 
       await axios.put(
-        `http://localhost:5000/api/credit/${updateData._id}`,
+        `https://bebsa.ahadalichowdhury.online/api/credit/${updateData._id}`,
         updateData
       );
       setShowUpdateModal(false);
@@ -221,7 +221,7 @@ const StatementPage = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:5000/api/credit/${deleteId}`);
+      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`);
       setShowDeleteConfirm(false);
       fetchTransactions(); // Refresh the data
       alert("Record deleted successfully");
