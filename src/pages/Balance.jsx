@@ -15,6 +15,7 @@ import {
 import { jsPDF } from "jspdf"
 // Import autoTable plugin with proper syntax
 import { autoTable } from 'jspdf-autotable'
+import { Link } from "react-router-dom"
 
 const Balance = () => {
     const getFormattedDate = (date) => {
@@ -447,6 +448,15 @@ const Balance = () => {
         </div>
 
         {/* Pagination */}
+        <div className="flex items-center justify-between">
+        <Link
+            to="/"
+             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+            <div>
+
         <div className="mt-4 flex justify-center items-center space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -465,6 +475,8 @@ const Balance = () => {
           >
             <FiChevronRight />
           </button>
+        </div>
+            </div>
         </div>
         
         {/* Update Modal - Added max-height and overflow-y-auto */}

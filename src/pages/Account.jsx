@@ -16,6 +16,9 @@ import {
 import { jsPDF } from "jspdf"
 // Import autoTable plugin with proper syntax
 import { autoTable } from 'jspdf-autotable'
+import { Link } from "react-router-dom"
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const MobileAccounts = () => {
     const getFormattedDate = (date) => {
@@ -98,6 +101,7 @@ const MobileAccounts = () => {
       setTotalPages(response.data.data.pagination.totalPages)
     } catch (error) {
       console.error("Error fetching transactions:", error)
+      toast.error("Failed to fetch transactions. Please try again.")
     }
   }
 
@@ -122,6 +126,7 @@ const MobileAccounts = () => {
       setAccountsTotalPages(response.data.pagination.totalPages)
     } catch (error) {
       console.error("Error fetching accounts:", error)
+      toast.error("Failed to fetch accounts. Please try again.")
     } finally {
       setIsSearching(false)
     }
@@ -170,12 +175,16 @@ const MobileAccounts = () => {
       setSelectCompany("Nagad Personal")
       setMobileNumber("")
       
+      // Show success toast
+      toast.success(`Account created successfully: ${mobileNumber}`)
+      
       // Refresh accounts list
       fetchAccounts()
       
     } catch (error) {
       console.error("Error creating account:", error)
       setError(error.response?.data?.message || "Failed to create account. Please try again.")
+      toast.error("Failed to create account. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -220,12 +229,16 @@ const MobileAccounts = () => {
       setUpdateSelectCompany("Nagad Personal")
       setUpdateMobileNumber("")
       
+      // Show success toast
+      toast.success(`Account updated successfully: ${updateMobileNumber}`)
+      
       // Refresh accounts list
       fetchAccounts()
       
     } catch (error) {
       console.error("Error updating account:", error)
       setUpdateError(error.response?.data?.message || "Failed to update account. Please try again.")
+      toast.error("Failed to update account. Please try again.")
     } finally {
       setIsUpdating(false)
     }
@@ -250,6 +263,9 @@ const MobileAccounts = () => {
       // Close modal and reset state
       setShowDeleteModal(false)
       setDeleteAccountId("")
+      
+      // Show success toast
+      toast.success(`Account deleted successfully: ${deleteAccountNumber}`)
       setDeleteAccountNumber("")
       
       // Refresh accounts list
@@ -257,7 +273,7 @@ const MobileAccounts = () => {
       
     } catch (error) {
       console.error("Error deleting account:", error)
-      alert("Failed to delete account. Please try again.") // Simple error notification
+      toast.error("Failed to delete account. Please try again.")
     } finally {
       setIsDeleting(false)
     }
@@ -265,6 +281,19 @@ const MobileAccounts = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-5xl">
+        {/* Toast Container */}
+        <ToastContainer 
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        
         <div className="text-center mb-10 mt-10">
           <h1 className="text-4xl font-bold">Accounts</h1>
         </div>
@@ -415,6 +444,15 @@ const MobileAccounts = () => {
           </div>
           
           {/* Account Pagination */}
+          <div className="flex items-center justify-between">
+          <Link
+            to="/"
+             className="bg-gray-500 mt-6 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+            <div>
+
           {accounts.length > 0 && (
             <div className="mt-4 flex justify-center items-center space-x-2">
               <button
@@ -436,6 +474,9 @@ const MobileAccounts = () => {
               </button>
             </div>
           )}
+            </div>
+
+          </div>
         </div>
 
         {/* Create Account Modal */}

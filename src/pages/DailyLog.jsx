@@ -6,6 +6,7 @@ import {
   FiChevronRight,
   FiChevronUp,
 } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const DailyLog = () => {
   const [transactions, setTransactions] = useState([]);
@@ -268,6 +269,15 @@ const DailyLog = () => {
       </div>
 
       {/* Pagination */}
+      <div className="flex items-center justify-between">
+      <Link
+            to="/"
+             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+        <div>
+
       <div className="mt-4 flex justify-center items-center space-x-2">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -288,6 +298,9 @@ const DailyLog = () => {
         >
           <FiChevronRight />
         </button>
+      </div>
+        </div>
+
       </div>
     </div>
   );

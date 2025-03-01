@@ -8,9 +8,34 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiX,
-  FiSearch
+  FiSearch,
+  FiCheck,
+  FiAlertCircle,
+  FiInfo
 } from "react-icons/fi"
+import { Link } from "react-router-dom";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
+const Toast = ({ message, type, onClose }) => {
+  const bgColor = type === 'success' ? 'bg-green-500' : 
+                  type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+  
+  const Icon = type === 'success' ? FiCheck : 
+              type === 'error' ? FiAlertCircle : FiInfo;
+  
+  return (
+    <div className={`fixed top-4 right-4 z-50 flex items-center p-4 mb-4 rounded-lg shadow-lg ${bgColor} text-white min-w-64 max-w-xs`}>
+      <div className="mr-2">
+        <Icon size={20} />
+      </div>
+      <div className="flex-1">{message}</div>
+      <button onClick={onClose} className="ml-2">
+        <FiX size={18} />
+      </button>
+    </div>
+  );
+};
 
 const Customer = () => {
     const getFormattedDate = (date) => {
@@ -56,6 +81,9 @@ const Customer = () => {
     const [customersTotalPages, setCustomersTotalPages] = useState(0)
     const [isSearching, setIsSearching] = useState(false)
 
+    // Toast notification state
+    const [toast, setToast] = useState({ show: false, message: "", type: "success" })
+
   useEffect(() => {
     fetchTransactions()
   }, [currentPage, startDate, endDate])
@@ -64,6 +92,22 @@ const Customer = () => {
     // Fetch customers when search query or page changes
     fetchCustomers()
   }, [searchQuery, customersCurrentPage])
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ ...toast, show: false });
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  // Function to show toast
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -156,12 +200,16 @@ const Customer = () => {
       setCustomerName("")
       setMobileNumber("")
       
+      // Show success toast
+      showToast(`Customer ${customerName} created successfully!`, "success")
+      
       // Refresh customers list
       fetchCustomers()
       
     } catch (error) {
       console.error("Error creating customer:", error)
       setError(error.response?.data?.message || "Failed to create customer. Please try again.")
+      showToast("Failed to create customer", "error")
     } finally {
       setIsSubmitting(false)
     }
@@ -206,12 +254,16 @@ const Customer = () => {
       setUpdateCustomerName("")
       setUpdateMobileNumber("")
       
+      // Show success toast
+      showToast(`Customer ${updateCustomerName} updated successfully!`, "success")
+      
       // Refresh customers list
       fetchCustomers()
       
     } catch (error) {
       console.error("Error updating customer:", error)
       setUpdateError(error.response?.data?.message || "Failed to update customer. Please try again.")
+      showToast("Failed to update customer", "error")
     } finally {
       setIsUpdating(false)
     }
@@ -233,6 +285,9 @@ const Customer = () => {
       
       console.log("Customer deleted successfully")
       
+      // Show success toast
+      showToast(`Customer ${deleteCustomerName} deleted successfully!`, "success")
+      
       // Close modal and reset state
       setShowDeleteModal(false)
       setDeleteCustomerId("")
@@ -243,20 +298,142 @@ const Customer = () => {
       
     } catch (error) {
       console.error("Error deleting customer:", error)
-      alert("Failed to delete customer. Please try again.") // Simple error notification
+      showToast("Failed to delete customer", "error")
     } finally {
       setIsDeleting(false)
     }
   }
+  const downloadCustomersPDF = () => {
+    try {
+      console.log("Download PDF function called");
+  
+      // Check if customers exist before proceeding
+      if (!customers || customers.length === 0) {
+        console.error("No customer data available to download");
+        showToast("No customer data available to download", "error");
+        return;
+      }
+  
+      // Initialize jsPDF - use portrait orientation
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+  
+      doc.setFontSize(18);
+  
+      // Center "Deb Telecom"
+      const title = "Deb Telecom";
+      doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
+  
+      // Center "Moulvibazar Road, Afrozganj Bazar Sherpur"
+      const address = "Moulvibazar Road, Afrozganj Bazar Sherpur";
+      doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
+  
+      // Center "Customer Register"
+      const subtitle = "Customer Register";
+      doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
+  
+      // Add report metadata
+      doc.setFontSize(11);
+  
+      const searchQueryText = searchQuery 
+        ? `Search Query: ${searchQuery}` 
+        : "All Customers";
+      doc.text(
+        searchQueryText,
+        (pageWidth - doc.getTextWidth(searchQueryText)) / 2,
+        48
+      );
+  
+      const totalCustomersText = `Total Customers: ${customersTotal || 0}`;
+      doc.text(
+        totalCustomersText,
+        (pageWidth - doc.getTextWidth(totalCustomersText)) / 2,
+        54
+      );
+  
+      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      doc.text(
+        generatedText,
+        (pageWidth - doc.getTextWidth(generatedText)) / 2,
+        60
+      );
+  
+      // Format customer data for the table
+      const tableData = customers.map((customer) => [
+        customer.customerName || "",
+        customer.mobileNumber || "",
+        new Date(customer.createdAt).toLocaleDateString() || "",
+      ]);
+  
+      // Define table columns
+      const headers = [
+        "Customer Name",
+        "Mobile Number",
+        "Created Date"
+      ];
+  
+      // Add customers table with auto table and capture the final Y position
+      let finalY;
+      autoTable(doc, {
+        startY: 70,
+        head: [headers],
+        body: tableData,
+        theme: "grid",
+        headStyles: { fillColor: [66, 66, 66] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { top: 48 },
+        didDrawPage: (data) => {
+          finalY = data.cursor.y; // This captures the Y position after the table is drawn
+        },
+      });
+  
+      // Add horizontal line after the table
+      doc.setDrawColor(0); // Black color
+      doc.setLineWidth(0.5); // Line width
+      doc.line(10, finalY + 10, pageWidth - 10, finalY + 10); // Draw line
+  
+      // Add total customers text below the line
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      const grandTotalText = `Total Customers: ${customersTotal || 0}`;
+      doc.text(
+        grandTotalText,
+        pageWidth - 20 - doc.getTextWidth(grandTotalText),
+        finalY + 20
+      ); // Right-aligned
+  
+      // Save the PDF
+      const fileName = searchQuery
+        ? `customers_search_${searchQuery}.pdf`
+        : `all_customers.pdf`;
+      console.log("Saving PDF with filename:", fileName);
+      doc.save(fileName);
+  
+      console.log("PDF download complete");
+      showToast("PDF downloaded successfully", "success");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      showToast("Error generating PDF: " + error.message, "error");
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-5xl">
+        {/* Toast Notification */}
+        {toast.show && (
+          <Toast 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => setToast({ ...toast, show: false })} 
+          />
+        )}
+
         <div className="text-center mb-10 mt-10">
           <h1 className="text-4xl font-bold">Customers</h1>
         </div>
 
-        <div className="flex items-center gap-4 md:gap-6 md:mb-4">
-          <div className="flex justify-between items-center gap-5 md:gap-7">
+        <div className="flex items-center gap-4 md:gap-6 md:mb-4 ">
+          <div className="md:flex justify-between items-center gap-5 md:gap-7">
             {/* Search Input with Icon */}
             <div className="flex flex-col relative">
               <div className="flex items-center">
@@ -268,18 +445,22 @@ const Customer = () => {
                   placeholder="Search by name or number..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="pl-10 p-2 border rounded w-40 sm:w-52 md:w-96"
+                  className="pl-10 p-2 border rounded w-36 sm:w-52 md:w-96"
                 />
               </div>
             </div>
 
             {/* Create Button */}
-            <div className="ml-auto text-lg font-semibold md:ml-96">
+            <div className="ml-auto text-lg font-semibold flex mt-10 md:ml-52 md:mt-0 sm:mt-10 gap-2">
               <button 
                 className="bg-green-500 py-2 px-12 md:ml-5 rounded-lg text-white hover:bg-green-600 transition-colors"
                 onClick={() => setShowModal(true)}
               >
                 Create
+              </button>
+
+              <button className="bg-blue-500 py-2 px-12 md:ml-5 rounded-lg text-white hover:bg-green-600 transition-colors" onClick={downloadCustomersPDF}>
+                Download
               </button>
             </div>
           </div>
@@ -397,6 +578,16 @@ const Customer = () => {
           </div>
           
           {/* Customer Pagination */}
+          <div className="flex items-center justify-between">
+          <Link
+            to="/"
+             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+           
+            <div >
+
           {customers.length > 0 && (
             <div className="mt-4 flex justify-center items-center space-x-2">
               <button
@@ -418,6 +609,8 @@ const Customer = () => {
               </button>
             </div>
           )}
+            </div>
+          </div>
         </div>
 
         {/* Create Customer Modal */}

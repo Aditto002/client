@@ -15,6 +15,10 @@ import {
 import { jsPDF } from "jspdf";
 // Import autoTable plugin
 import autoTable from "jspdf-autotable";
+import { Link } from "react-router-dom";
+// Import toast
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DailyTransaction = () => {
   const [transactions, setTransactions] = useState([]);
@@ -83,17 +87,19 @@ const DailyTransaction = () => {
       if (response.data && response.data.data) {
         setTransactions(response.data.data.customers || []);
         setTotalAmount(response.data.data);
+        console.log("object", totalAmount);
         setTotalPages(response.data.data.pagination?.totalPages || 1);
       } else {
         console.error("Unexpected response format:", response.data);
         setTransactions([]);
-        setTotalAmount({ totalAmount: 0 });
+        // setTotalAmount({ totalAmount: 0,totalRemarks:0 });
         setTotalPages(1);
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
+      toast.error("Failed to fetch transactions");
       setTransactions([]);
-      setTotalAmount({ totalAmount: 0 });
+      // setTotalAmount({ totalAmount: 0,totalRemarks:0 });
       setTotalPages(1);
     } finally {
       setIsLoading(false); // End loading regardless of outcome
@@ -128,6 +134,7 @@ const DailyTransaction = () => {
       }
     } catch (error) {
       console.error("Error fetching PDF data:", error);
+      toast.error("Failed to fetch PDF data");
       setPDFData([]);
     } finally {
       setIsPdfLoading(false); // End PDF loading regardless of outcome
@@ -144,6 +151,7 @@ const DailyTransaction = () => {
     setStartDate(tempStartDate);
     setEndDate(tempEndDate);
     setCurrentPage(1); // Reset pagination to first page
+    toast.info("Filters applied");
   };
 
   // Function to download transactions as PDF
@@ -154,7 +162,7 @@ const DailyTransaction = () => {
       // Check if transactions exist before proceeding
       if (!transactions || transactions.length === 0) {
         console.error("No transactions data available to download");
-        alert("No transactions data available to download");
+        toast.error("No transactions data available to download");
         return;
       }
 
@@ -262,9 +270,10 @@ const DailyTransaction = () => {
       doc.save(fileName);
 
       console.log("PDF download complete");
+      toast.success("PDF downloaded successfully");
     } catch (error) {
       console.error("Error generating PDF:", error);
-      alert("Error generating PDF: " + error.message);
+      toast.error("Error generating PDF: " + error.message);
     }
   };
 
@@ -312,10 +321,10 @@ const DailyTransaction = () => {
       );
       setIsUpdateModalOpen(false);
       fetchTransactions(); // Refresh data after update
-      alert("Transaction updated successfully");
+      toast.success("Transaction updated successfully");
     } catch (error) {
       console.error("Error updating transaction:", error);
-      alert("Error updating transaction: " + error.message);
+      toast.error("Error updating transaction: " + error.message);
     }
   };
 
@@ -324,7 +333,7 @@ const DailyTransaction = () => {
     // Make sure we're capturing the correct ID
     if (!id) {
       console.error("Cannot delete: Transaction ID is undefined");
-      alert("Cannot delete: Transaction ID is missing");
+      toast.error("Cannot delete: Transaction ID is missing");
       return;
     }
     setDeleteId(id);
@@ -347,10 +356,10 @@ const DailyTransaction = () => {
       );
       setIsDeleteConfirmOpen(false);
       fetchTransactions(); // Refresh data after delete
-      alert("Transaction deleted successfully");
+      toast.success("Transaction deleted successfully");
     } catch (error) {
       console.error("Error deleting transaction:", error);
-      alert("Error deleting transaction: " + error.message);
+      toast.error("Error deleting transaction: " + error.message);
     }
   };
 
@@ -363,6 +372,19 @@ const DailyTransaction = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      
       <div className="text-center mb-10 mt-10">
         <h1 className="text-4xl font-bold">Daily Transaction</h1>
       </div>
@@ -419,7 +441,7 @@ const DailyTransaction = () => {
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center md:ml-96 gap-4">
+          <div className="flex items-center  gap-4">
             <button
               onClick={handleApplyFilters}
               className="bg-green-500 text-white py-2 px-5 rounded-lg"
@@ -445,9 +467,21 @@ const DailyTransaction = () => {
               )}
             </button>
           </div>
-          <div className="ml-auto text-lg font-semibold">
-            <p>Total Amount: {totalAmount?.totalAmount || 0}</p>
+          <div>
+            
           </div>
+          
+
+          <div className="ml-auto text-lg font-semibold  text-gray-600 rounded-md flex items-center gap-5">
+            <div className=" bg-green-100 py-2 px-3 rounded-md">
+
+            <p>Total Amount: {totalAmount?.totalAmount || 0}</p>
+            </div>
+             <div className=" bg-green-100 py-2 px-3 rounded-md">
+             <p>Total Remarks: {totalAmount?.totalRemarks || 0}</p>
+             </div>
+          </div>
+          
         </div>
         {/* Total Amount */}
       </div>
@@ -696,6 +730,15 @@ const DailyTransaction = () => {
           </div>
 
           {/* Pagination */}
+          <div className="flex items-center justify-between">
+          <Link
+            to="/"
+             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+            <div>
+
           {totalPages > 0 && (
             <div className="mt-6 flex justify-center items-center space-x-2">
               <button
@@ -721,6 +764,8 @@ const DailyTransaction = () => {
               </button>
             </div>
           )}
+            </div>
+          </div>
         </>
       )}
 

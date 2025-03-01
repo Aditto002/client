@@ -14,6 +14,7 @@ import {
 import { jsPDF } from "jspdf";
 // Import autoTable plugin with proper syntax
 import { autoTable } from "jspdf-autotable";
+import { Link } from "react-router-dom";
 
 const StatementPage = () => {
   const [transactions, setTransactions] = useState([]);
@@ -55,11 +56,11 @@ const StatementPage = () => {
     if (numberFromUrl) setSelectedNumber(numberFromUrl);
     if (startDateFromUrl) {
       setStartDate(startDateFromUrl);
-      setTempStartDate(startDateFromUrl);
+      setTempStartDate("");
     }
     if (endDateFromUrl) {
       setEndDate(endDateFromUrl);
-      setTempEndDate(endDateFromUrl);
+      setTempEndDate("");
     }
   }, []);
 
@@ -444,9 +445,9 @@ const StatementPage = () => {
               <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Date
               </th>
-              <th className="text-left py-4 px-4 text-gray-500 font-medium">
+              {/* <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Action
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody>
@@ -481,7 +482,7 @@ const StatementPage = () => {
                 <td className="py-4 px-4 text-gray-700">
                   {new Date(transaction.createdAt).toLocaleDateString()}
                 </td>
-                <td className="py-4 px-4">
+                {/* <td className="py-4 px-4">
                   <div className="flex gap-2">
                     <button
                       className="text-blue-500 hover:text-blue-700"
@@ -498,7 +499,7 @@ const StatementPage = () => {
                       <FiTrash size={18} />
                     </button>
                   </div>
-                </td>
+                </td> */}
               </tr>
             ))}
           </tbody>
@@ -602,6 +603,15 @@ const StatementPage = () => {
       </div>
 
       {/* Pagination */}
+      <div className="flex items-center justify-between">
+      <Link
+            to="/"
+             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+            >
+               Back
+            </Link>
+            <div>
+
       <div className="mt-4 flex justify-center items-center space-x-2">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -622,6 +632,8 @@ const StatementPage = () => {
         >
           <FiChevronRight />
         </button>
+      </div>
+            </div>
       </div>
 
       {/* Update Modal */}
