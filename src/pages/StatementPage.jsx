@@ -527,7 +527,7 @@ const StatementPage = () => {
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-gray-900">
-                    ₹{transaction.newAmount}
+                    {transaction.newAmount}
                   </div>
                   <div className="text-sm text-gray-500">
                     {new Date(transaction.createdAt).toLocaleDateString()}
@@ -578,7 +578,7 @@ const StatementPage = () => {
                     </div>
                   </div>
                   <div className="pt-3">
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                       <button
                         className="p-2 hover:bg-gray-100 rounded-full text-blue-500"
                         onClick={() => handleUpdateClick(transaction)}
@@ -593,7 +593,7 @@ const StatementPage = () => {
                       >
                         <FiTrash size={18} />
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}
