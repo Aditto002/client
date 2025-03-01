@@ -307,7 +307,7 @@ const StatementPage = () => {
         transaction.selectedAccount || "",
         transaction.newAmount || "",
         transaction.remarks || "",
-        transaction.statement || "",
+        // transaction.statement || "",
         new Date(transaction.createdAt).toLocaleDateString(),
       ]);
 
@@ -319,7 +319,7 @@ const StatementPage = () => {
         "Account",
         "Amount",
         "Remarks",
-        "Statement",
+        // "Statement",
         "Date",
       ];
 
