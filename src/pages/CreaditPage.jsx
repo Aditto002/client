@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { toast, ToastContainer } from 'react-toastify'; // Import toast
+import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
 
 export default function CreditPage() {
   const navigate = useNavigate(); // Initialize useNavigate hook
@@ -68,6 +70,7 @@ export default function CreditPage() {
         }
       } catch (error) {
         console.error("Error fetching company details:", error);
+        toast.error("Failed to fetch company details");
       }
     };
 
@@ -142,6 +145,7 @@ export default function CreditPage() {
       setShowSuggestions(foundCustomers.length > 0);
     } catch (error) {
       console.error("Error fetching customer suggestions:", error);
+      toast.error("Error searching for customers");
     }
   };
 
@@ -191,6 +195,7 @@ export default function CreditPage() {
       setValidationError(
         "Please select a company before proceeding to statement"
       );
+      toast.warning("Please select a company");
       return;
     }
 
@@ -198,6 +203,7 @@ export default function CreditPage() {
       setValidationError(
         "Please select a number before proceeding to statement"
       );
+      toast.warning("Please select a number");
       return;
     }
 
@@ -220,13 +226,24 @@ export default function CreditPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate required fields before submission
+    if (!formData.customerName || !formData.customerNumber) {
+      toast.error("Customer information is required");
+      return;
+    }
+
+    if (!formData.company || !formData.selectedAccount) {
+      toast.error("Company and number selection is required");
+      return;
+    }
+
     try {
       const response = await axios.post(
         `https://bebsa.ahadalichowdhury.online/api/credit`,
         formData
       );
       console.log("Success:", response.data);
-      alert("Transaction submitted successfully!");
+      toast.success("Transaction submitted successfully!"); // Show success toast
 
       // Reset form after successful submission
       setFormData({
@@ -247,12 +264,25 @@ export default function CreditPage() {
         "Error submitting transaction:",
         error.response?.data || error.message
       );
-      alert("Failed to submit transaction. Please try again.");
+      toast.error("Failed to submit transaction. Please try again."); // Show error toast
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
+      {/* Add ToastContainer at the top of the component */}
+      <ToastContainer 
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      
       <h1 className="text-3xl font-bold text-center mb-8">Credit</h1>
 
       {/* Show validation error message if exists */}

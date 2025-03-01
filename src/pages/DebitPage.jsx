@@ -1,6 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 export default function DebitPage() {
   const [companyData, setCompanyData] = useState([]);
   const [selectedAmount, setSelectedAmount] = useState();
@@ -11,6 +14,7 @@ export default function DebitPage() {
     statement: "",
     entryBy: "",
   });
+
   useEffect(() => {
     const userString = localStorage.getItem("user");
     if (userString) {
@@ -55,11 +59,13 @@ export default function DebitPage() {
         }
       } catch (error) {
         console.error("Error fetching company details:", error);
+        toast.error("Failed to fetch company details");
       }
     };
 
     fetchCompanyDetails();
   }, [formData.company]);
+
   const handleNumberSelection = (selectedMobile) => {
     // setSelectedAmount()
     const selectedAccount = companyData.find(
@@ -85,7 +91,9 @@ export default function DebitPage() {
         formData
       );
       console.log("Success:", response.data);
-      alert("submitted successfully!");
+      
+      // Show success toast notification
+      toast.success("Transaction submitted successfully!");
 
       // Reset form after successful submission
       setFormData({
@@ -96,17 +104,33 @@ export default function DebitPage() {
         entryBy: formData.entryBy,
       });
       setCompanyData([]); // Clear company data
+      setSelectedAmount(""); // Clear selected amount
     } catch (error) {
       console.error(
         "Error submitting transaction:",
         error.response?.data || error.message
       );
-      alert("Failed to submit transaction. Please try again.");
+      
+      // Show error toast notification
+      toast.error("Failed to submit transaction. Please try again.");
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
+      {/* Toast Container */}
+      <ToastContainer 
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      
       <h1 className="text-3xl font-bold text-center mb-8">Debit</h1>
       {/* <div className="text-emerald-500 font-bold text-xl mb-6">Debit</div> */}
 
