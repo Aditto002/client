@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const response = await axios.post("/api/user/reset-password", {
+      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/user/reset-password", {
         name: username,
         newPassword,
       });
