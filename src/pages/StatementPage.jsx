@@ -6,8 +6,6 @@ import {
   FiChevronRight,
   FiChevronUp,
   FiDownload,
-  FiEdit,
-  FiTrash,
   FiX,
 } from "react-icons/fi";
 // Import jsPDF correctly
@@ -221,7 +219,9 @@ const StatementPage = () => {
         return;
       }
 
-      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`);
+      await axios.delete(
+        `https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`
+      );
       setShowDeleteConfirm(false);
       fetchTransactions(); // Refresh the data
       alert("Record deleted successfully");
@@ -439,9 +439,9 @@ const StatementPage = () => {
               <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Remarks
               </th>
-              <th className="text-left py-4 px-4 text-gray-500 font-medium">
+              {/* <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Statement
-              </th>
+              </th> */}
               <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Date
               </th>
@@ -476,9 +476,9 @@ const StatementPage = () => {
                 <td className="py-4 px-4 text-gray-700">
                   {transaction.remarks}
                 </td>
-                <td className="py-4 px-4 text-gray-700">
+                {/* <td className="py-4 px-4 text-gray-700">
                   {transaction.statement}
-                </td>
+                </td> */}
                 <td className="py-4 px-4 text-gray-700">
                   {new Date(transaction.createdAt).toLocaleDateString()}
                 </td>
@@ -604,36 +604,35 @@ const StatementPage = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-      <Link
-            to="/"
-             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+        <Link
+          to="/"
+          className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+        >
+          Back
+        </Link>
+        <div>
+          <div className="mt-4 flex justify-center items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
             >
-               Back
-            </Link>
-            <div>
-
-      <div className="mt-4 flex justify-center items-center space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-        >
-          <FiChevronLeft />
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-        >
-          <FiChevronRight />
-        </button>
-      </div>
-            </div>
+              <FiChevronLeft />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+            >
+              <FiChevronRight />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Update Modal */}
