@@ -1,21 +1,16 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import {
-  FiUser,
   FiEdit,
   FiTrash,
   FiChevronDown,
   FiChevronUp,
   FiChevronLeft,
   FiChevronRight,
-  FiDownload,
   FiX,
   FiSearch
 } from "react-icons/fi"
-// Import jsPDF correctly
-import { jsPDF } from "jspdf"
-// Import autoTable plugin with proper syntax
-import { autoTable } from 'jspdf-autotable'
+
 
 const Customer = () => {
     const getFormattedDate = (date) => {
