@@ -1,59 +1,59 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function CreditPage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    customerName: "",
-    customerNumber: "",
-    company: "",
-    selectedAccount: "",
-    selectedNumber: "",
+    customerName: '',
+    customerNumber: '',
+    company: '',
+    selectedAccount: '',
+    previousAmount: '',
     newAmount: 0,
-    remarks: "",
-    entryBy: "",
-    statement: "",
-  });
+    remarks: '',
+    entryBy: '',
+    statement: '',
+  })
 
-  const [companyData, setCompanyData] = useState([]);
-  const [customerSuggestions, setCustomerSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [companyData, setCompanyData] = useState([])
+  const [customerSuggestions, setCustomerSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   // Add validation error state
-  const [validationError, setValidationError] = useState("");
+  const [validationError, setValidationError] = useState('')
 
   // Get user from localStorage and set entryBy when component mounts
   useEffect(() => {
-    const userString = localStorage.getItem("user");
+    const userString = localStorage.getItem('user')
     if (userString) {
       try {
-        const userData = JSON.parse(userString);
+        const userData = JSON.parse(userString)
         if (userData && userData.name) {
           // Check if name is "Rajib" or "Rony" and set accordingly
-          if (userData.name === "Rajib") {
-            setFormData((prev) => ({ ...prev, entryBy: "Rajib" }));
-          } else if (userData.name === "Rony") {
-            setFormData((prev) => ({ ...prev, entryBy: "Rony" }));
+          if (userData.name === 'Rajib') {
+            setFormData((prev) => ({ ...prev, entryBy: 'Rajib' }))
+          } else if (userData.name === 'Rony') {
+            setFormData((prev) => ({ ...prev, entryBy: 'Rony' }))
           } else {
             // For any other name, default behavior
-            setFormData((prev) => ({ ...prev, entryBy: userData.name }));
+            setFormData((prev) => ({ ...prev, entryBy: userData.name }))
           }
         }
       } catch (e) {
-        console.error("Error parsing user from localStorage:", e);
+        console.error('Error parsing user from localStorage:', e)
       }
     }
-  }, []);
+  }, [])
 
   // Fetch data when company is selected
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       if (!formData.company) {
-        setCompanyData([]);
-        return;
+        setCompanyData([])
+        return
       }
 
       try {
@@ -61,66 +61,81 @@ export default function CreditPage() {
           `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
-        );
+        )
 
         if (response.data && response.data.success) {
           // Make sure we have valid data before setting it
-          setCompanyData(response.data.data || []);
-          setFormData((prev) => ({
-            ...prev,
-            selectedAccount: "",
-            selectedNumber: "",
-          }));
+          setCompanyData(response.data.data || [])
+
+          // If there's a selected account, update its details
+          if (formData.selectedAccount) {
+            const selectedAccount = response.data.data.find(
+              (item) => item && item.mobileNumber === formData.selectedAccount
+            )
+
+            if (selectedAccount && selectedAccount.totalAmount !== undefined) {
+              setFormData((prev) => ({
+                ...prev,
+                previousAmount: selectedAccount.totalAmount.toString(),
+              }))
+            }
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              selectedAccount: '',
+              previousAmount: '',
+            }))
+          }
         } else {
           // If the response is not successful, set empty array
-          setCompanyData([]);
+          setCompanyData([])
         }
       } catch (error) {
-        console.error("Error fetching company details:", error);
-        toast.error("Failed to fetch company details");
-        setCompanyData([]);
+        console.error('Error fetching company details:', error)
+        toast.error('Failed to fetch company details')
+        setCompanyData([])
       }
-    };
+    }
 
-    fetchCompanyDetails();
-  }, [formData.company]);
+    fetchCompanyDetails()
+  }, [formData.company])
 
   // Handle number selection and update credit amount
   const handleNumberSelection = (selectedMobile) => {
     if (!selectedMobile) {
       setFormData((prev) => ({
         ...prev,
-        selectedAccount: "",
-        selectedNumber: "",
-      }));
-      return;
+        selectedAccount: '',
+        previousAmount: '',
+      }))
+      return
     }
 
     const selectedAccount = companyData.find(
       (item) => item && item.mobileNumber === selectedMobile
-    );
+    )
 
     if (selectedAccount && selectedAccount.totalAmount !== undefined) {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
-        selectedNumber: selectedAccount.totalAmount.toString(),
-      }));
+        previousAmount: selectedAccount.totalAmount.toString(),
+      }))
     } else {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
-        selectedNumber: "0", // Default to "0" if totalAmount is undefined
-      }));
+        previousAmount: '0', // Default to "0" if totalAmount is undefined
+      }))
     }
-  };
+  }
 
   // Modified to fetch customer suggestions by both name and number
   const fetchCustomerSuggestions = async (searchInput) => {
-    if (!searchInput || searchInput.trim() === "") {
-      setCustomerSuggestions([]);
-      setShowSuggestions(false);
-      return;
+    if (!searchInput || searchInput.trim() === '') {
+      setCustomerSuggestions([])
+      setShowSuggestions(false)
+      return
     }
 
     try {
@@ -129,11 +144,11 @@ export default function CreditPage() {
         `https://bebsa.ahadalichowdhury.online/api/customers/search?customer=${encodeURIComponent(
           searchInput
         )}`
-      );
+      )
 
-      let foundCustomers = [];
+      let foundCustomers = []
       if (response.data && response.data.success) {
-        foundCustomers = response.data.data || [];
+        foundCustomers = response.data.data || []
       }
 
       // If the search input could be a partial phone number, try to match by mobile number directly
@@ -145,7 +160,7 @@ export default function CreditPage() {
             `https://bebsa.ahadalichowdhury.online/api/customers/search?mobileNumber=${encodeURIComponent(
               searchInput
             )}`
-          );
+          )
 
           if (
             numberResponse.data &&
@@ -156,154 +171,189 @@ export default function CreditPage() {
             // Add any new results that weren't already found
             numberResponse.data.data.forEach((customer) => {
               if (!foundCustomers.some((c) => c && c._id === customer._id)) {
-                foundCustomers.push(customer);
+                foundCustomers.push(customer)
               }
-            });
+            })
           }
         } catch (error) {
           // Silently continue if the second endpoint doesn't exist
-          console.log("Mobile number specific search not available");
+          console.log('Mobile number specific search not available')
         }
       }
 
       // Set results even if we just have results from the first search
-      setCustomerSuggestions(foundCustomers);
-      setShowSuggestions(foundCustomers.length > 0);
+      setCustomerSuggestions(foundCustomers)
+      setShowSuggestions(foundCustomers.length > 0)
     } catch (error) {
-      console.error("Error fetching customer suggestions:", error);
-      toast.error("Error searching for customers");
-      setCustomerSuggestions([]);
-      setShowSuggestions(false);
+      console.error('Error fetching customer suggestions:', error)
+      toast.error('Error searching for customers')
+      setCustomerSuggestions([])
+      setShowSuggestions(false)
     }
-  };
+  }
 
   // Handle search input change
   const handleSearchInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+    const value = e.target.value
+    setSearchTerm(value)
     setFormData((prev) => ({
       ...prev,
       customerName: value, // Update customer name as they type (for backward compatibility)
-    }));
-    fetchCustomerSuggestions(value);
-  };
+    }))
+    fetchCustomerSuggestions(value)
+  }
 
   // Client-side filtering for number search if the API doesn't handle it
   useEffect(() => {
-    if (searchTerm && /^\d+$/.test(searchTerm) && customerSuggestions.length > 0) {
+    if (
+      searchTerm &&
+      /^\d+$/.test(searchTerm) &&
+      customerSuggestions.length > 0
+    ) {
       // If the search term is numeric, filter results client-side as well
-      const filteredResults = customerSuggestions.filter((customer) =>
-        customer && customer.mobileNumber && customer.mobileNumber.includes(searchTerm)
-      );
+      const filteredResults = customerSuggestions.filter(
+        (customer) =>
+          customer &&
+          customer.mobileNumber &&
+          customer.mobileNumber.includes(searchTerm)
+      )
 
       if (filteredResults.length > 0) {
-        setCustomerSuggestions(filteredResults);
+        setCustomerSuggestions(filteredResults)
       }
     }
-  }, [searchTerm, customerSuggestions.length]);
+  }, [searchTerm, customerSuggestions.length])
 
   // Handle selection from dropdown
   const handleSelectCustomer = (customer) => {
-    if (!customer) return;
+    if (!customer) return
 
     setFormData((prev) => ({
       ...prev,
-      customerName: customer.customerName || "",
-      customerNumber: customer.mobileNumber || "",
-    }));
-    setSearchTerm(customer.customerName || "");
-    setCustomerSuggestions([]);
-    setShowSuggestions(false);
-  };
+      customerName: customer.customerName || '',
+      customerNumber: customer.mobileNumber || '',
+    }))
+    setSearchTerm(customer.customerName || '')
+    setCustomerSuggestions([])
+    setShowSuggestions(false)
+  }
 
   // Function to handle statement button click with validation
   const handleStatementClick = (e) => {
-    e.preventDefault(); // Prevent default Link behavior
+    e.preventDefault() // Prevent default button behavior
 
     // Validate if company and account are selected
     if (!formData.company) {
       setValidationError(
-        "Please select a company before proceeding to statement"
-      );
-      toast.warning("Please select a company");
-      return;
+        'Please select a company before proceeding to statement'
+      )
+      toast.warning('Please select a company')
+      return
     }
 
     if (!formData.selectedAccount) {
       setValidationError(
-        "Please select a number before proceeding to statement"
-      );
-      toast.warning("Please select a number");
-      return;
+        'Please select a number before proceeding to statement'
+      )
+      toast.warning('Please select a number')
+      return
     }
 
-    // If validation passes, clear any errors and navigate to statement page with params
-    setValidationError("");
+    // If validation passes, clear any errors
+    setValidationError('')
 
     // Get current date in YYYY-MM-DD format for default date range
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0]
 
-    // Navigate to statement page with query parameters
-    navigate(
-      `/statement?selectCompany=${encodeURIComponent(
-        formData.company
-      )}&selectedNumber=${encodeURIComponent(
-        formData.selectedAccount
-      )}&startDate=${today}&endDate=${today}`
-    );
-  };
+    // Construct the statement page URL
+    const statementUrl = `/statement?selectCompany=${encodeURIComponent(
+      formData.company
+    )}&selectedNumber=${encodeURIComponent(
+      formData.selectedAccount
+    )}&startDate=${today}&endDate=${today}`
+
+    // Open the statement page in a new tab
+    window.open(statementUrl, '_blank')
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     // Validate required fields before submission
     if (!formData.customerName || !formData.customerNumber) {
-      toast.error("Customer information is required");
-      return;
+      toast.error('Customer information is required')
+      return
     }
 
     if (!formData.company || !formData.selectedAccount) {
-      toast.error("Company and number selection is required");
-      return;
+      toast.error('Company and number selection is required')
+      return
     }
 
     try {
       const response = await axios.post(
         `https://bebsa.ahadalichowdhury.online/api/credit`,
         formData
-      );
-      console.log("Success:", response.data);
-      toast.success("Transaction submitted successfully!"); // Show success toast
+      )
+      console.log('Success:', response.data)
+      toast.success('Transaction submitted successfully!') // Show success toast
 
-      // Reset form after successful submission
-      setFormData({
-        customerName: "",
-        customerNumber: "",
-        company: "",
-        selectedAccount: "",
-        selectedNumber: "",
-        newAmount: 0,
-        remarks: "",
-        entryBy: formData.entryBy, // Keep the current entryBy value
-        statement: "",
-      });
-      setSearchTerm("");
-      setCompanyData([]);
+      // After successful submission, refetch the updated balance
+      try {
+        const updatedCompanyResponse = await axios.get(
+          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+            formData.company
+          )}`
+        )
+
+        if (
+          updatedCompanyResponse.data &&
+          updatedCompanyResponse.data.success
+        ) {
+          const updatedAccount = updatedCompanyResponse.data.data.find(
+            (item) => item && item.mobileNumber === formData.selectedAccount
+          )
+
+          if (updatedAccount && updatedAccount.totalAmount !== undefined) {
+            // Reset only specific fields while keeping company, number, and updating balance
+            setFormData((prev) => ({
+              ...prev,
+              customerName: '',
+              customerNumber: '',
+              previousAmount: updatedAccount.totalAmount.toString(),
+              newAmount: 0,
+              remarks: '',
+            }))
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching updated balance:', error)
+        // If we can't get the updated balance, still reset other fields
+        setFormData((prev) => ({
+          ...prev,
+          customerName: '',
+          customerNumber: '',
+          newAmount: 0,
+          remarks: '',
+        }))
+      }
+
+      setSearchTerm('')
     } catch (error) {
       console.error(
-        "Error submitting transaction:",
+        'Error submitting transaction:',
         error.response?.data || error.message
-      );
-      toast.error("Failed to submit transaction. Please try again."); // Show error toast
+      )
+      toast.error('Failed to submit transaction. Please try again.') // Show error toast
     }
-  };
+  }
 
   // Calculate total with null/undefined check
   const calculateTotal = () => {
-    const currentBalance = Number(formData.selectedNumber || 0);
-    const newAmount = Number(formData.newAmount || 0);
-    return currentBalance + newAmount;
-  };
+    const currentBalance = Number(formData.previousAmount || 0)
+    const newAmount = Number(formData.newAmount || 0)
+    return currentBalance + newAmount
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -345,20 +395,22 @@ export default function CreditPage() {
             />
             {showSuggestions && customerSuggestions.length > 0 && (
               <ul className="absolute z-10 w-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-                {customerSuggestions.map((customer) => (
+                {customerSuggestions.map((customer) =>
                   customer && customer._id ? (
                     <li
                       key={customer._id}
                       className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
                       onClick={() => handleSelectCustomer(customer)}
                     >
-                      <span className="font-medium">{customer.customerName || ""}</span>
+                      <span className="font-medium">
+                        {customer.customerName || ''}
+                      </span>
                       <span className="text-gray-600">
-                        {customer.mobileNumber || ""}
+                        {customer.mobileNumber || ''}
                       </span>
                     </li>
                   ) : null
-                ))}
+                )}
               </ul>
             )}
           </div>
@@ -414,13 +466,15 @@ export default function CreditPage() {
               required
             >
               <option value="">Select a number</option>
-              {companyData && companyData.length > 0 ? companyData.map((item) => (
-                item && item._id && item.mobileNumber ? (
-                  <option key={item._id} value={item.mobileNumber}>
-                    {item.mobileNumber}
-                  </option>
-                ) : null
-              )) : null}
+              {companyData && companyData.length > 0
+                ? companyData.map((item) =>
+                    item && item._id && item.mobileNumber ? (
+                      <option key={item._id} value={item.mobileNumber}>
+                        {item.mobileNumber}
+                      </option>
+                    ) : null
+                  )
+                : null}
             </select>
           </div>
         </div>
@@ -433,25 +487,22 @@ export default function CreditPage() {
             <input
               type="string"
               className="w-full border rounded-md p-2"
-              value={formData.selectedNumber || ""}
+              value={formData.previousAmount || ''}
               readOnly
             />
 
-            <p>
-              Total: {calculateTotal()}
-            </p>
+            <p>Total: {calculateTotal()}</p>
           </div>
           <div>
             <label className=" text-sm font-medium mb-1">CreditAmount</label>
             <input
               type="number"
               className="w-full border rounded-md p-2"
-              value={formData.newAmount === 0 ? "" : formData.newAmount}
+              value={formData.newAmount === 0 ? '' : formData.newAmount}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  newAmount:
-                    e.target.value === "" ? 0 : Number(e.target.value),
+                  newAmount: e.target.value === '' ? 0 : Number(e.target.value),
                 })
               }
             />
@@ -505,5 +556,5 @@ export default function CreditPage() {
         </div>
       </form>
     </div>
-  );
+  )
 }

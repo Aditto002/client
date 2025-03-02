@@ -34,7 +34,7 @@ const MobileAccounts = () => {
     const [endDate, setEndDate] = useState("") // Initialize with empty string
     const [tempStartDate, setTempStartDate] = useState("") // Initialize with empty string
     const [tempEndDate, setTempEndDate] = useState("") // Initialize with empty string
-      
+
     // State for create modal
     const [showModal, setShowModal] = useState(false)
     const [selectCompany, setSelectCompany] = useState("Nagad Personal")
@@ -88,7 +88,7 @@ const MobileAccounts = () => {
       const params = {
         page: currentPage,
       }
-      
+
       // Only add date parameters if they're not empty
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
@@ -153,34 +153,34 @@ const MobileAccounts = () => {
       setError("Company selection is required")
       return
     }
-    
+
     if (!mobileNumber.trim()) {
       setError("Mobile number is required")
       return
     }
-    
+
     try {
       setIsSubmitting(true)
       setError("")
-      
+
       const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
         selectCompany,
         mobileNumber
       })
-      
+
       console.log("Account created:", response.data)
-      
+
       // Close modal and reset form
       setShowModal(false)
       setSelectCompany("Nagad Personal")
       setMobileNumber("")
-      
+
       // Show success toast
       toast.success(`Account created successfully: ${mobileNumber}`)
-      
+
       // Refresh accounts list
       fetchAccounts()
-      
+
     } catch (error) {
       console.error("Error creating account:", error)
       setError(error.response?.data?.message || "Failed to create account. Please try again.")
@@ -198,7 +198,7 @@ const MobileAccounts = () => {
     setUpdateError("")
     setShowUpdateModal(true)
   }
-  
+
   // Function to handle account update
   const handleUpdateAccount = async () => {
     // Validate inputs
@@ -206,35 +206,35 @@ const MobileAccounts = () => {
       setUpdateError("Company selection is required")
       return
     }
-    
+
     if (!updateMobileNumber.trim()) {
       setUpdateError("Mobile number is required")
       return
     }
-    
+
     try {
       setIsUpdating(true)
       setUpdateError("")
-      
+
       const response = await axios.put(`https://bebsa.ahadalichowdhury.online/api/mobileAccounts/${updateAccountId}`, {
         selectCompany: updateSelectCompany,
         mobileNumber: updateMobileNumber
       })
-      
+
       console.log("Account updated:", response.data)
-      
+
       // Close modal and reset form
       setShowUpdateModal(false)
       setUpdateAccountId("")
       setUpdateSelectCompany("Nagad Personal")
       setUpdateMobileNumber("")
-      
+
       // Show success toast
       toast.success(`Account updated successfully: ${updateMobileNumber}`)
-      
+
       // Refresh accounts list
       fetchAccounts()
-      
+
     } catch (error) {
       console.error("Error updating account:", error)
       setUpdateError(error.response?.data?.message || "Failed to update account. Please try again.")
@@ -250,27 +250,27 @@ const MobileAccounts = () => {
     setDeleteAccountNumber(account.mobileNumber)
     setShowDeleteModal(true)
   }
-  
+
   // Function to handle account deletion
   const handleDeleteAccount = async () => {
     try {
       setIsDeleting(true)
-      
+
       await axios.delete(`https://bebsa.ahadalichowdhury.online/api/mobileAccounts/${deleteAccountId}`)
-      
+
       console.log("Account deleted successfully")
-      
+
       // Close modal and reset state
       setShowDeleteModal(false)
       setDeleteAccountId("")
-      
+
       // Show success toast
       toast.success(`Account deleted successfully: ${deleteAccountNumber}`)
       setDeleteAccountNumber("")
-      
+
       // Refresh accounts list
       fetchAccounts()
-      
+
     } catch (error) {
       console.error("Error deleting account:", error)
       toast.error("Failed to delete account. Please try again.")
@@ -282,7 +282,7 @@ const MobileAccounts = () => {
   return (
     <div className="container mx-auto p-4 max-w-5xl">
         {/* Toast Container */}
-        <ToastContainer 
+        <ToastContainer
           position="top-right"
           autoClose={3000}
           hideProgressBar={false}
@@ -293,7 +293,7 @@ const MobileAccounts = () => {
           draggable
           pauseOnHover
         />
-        
+
         <div className="text-center mb-10 mt-10">
           <h1 className="text-4xl font-bold">Accounts</h1>
         </div>
@@ -318,7 +318,7 @@ const MobileAccounts = () => {
 
             {/* Create Button */}
             <div className="ml-auto text-lg font-semibold md:ml-96">
-              <button 
+              <button
                 className="bg-green-500 py-2 px-12 md:ml-5 rounded-lg text-white hover:bg-green-600 transition-colors"
                 onClick={() => setShowModal(true)}
               >
@@ -360,13 +360,13 @@ const MobileAccounts = () => {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex gap-2">
-                        <button 
+                        <button
                           className="text-gray-500 hover:text-gray-700"
                           onClick={() => openUpdateModal(account)}
                         >
                           <FiEdit size={18} />
                         </button>
-                        <button 
+                        <button
                           className="text-gray-500 hover:text-gray-700"
                           onClick={() => openDeleteModal(account)}
                         >
@@ -379,7 +379,7 @@ const MobileAccounts = () => {
               </tbody>
             </table>
           </div>
-          
+
           {/* Mobile View for Accounts */}
           <div className="md:hidden space-y-4">
             {accounts.map((account) => (
@@ -422,13 +422,13 @@ const MobileAccounts = () => {
                       </div>
                       <div className="pt-3">
                         <div className="flex justify-between">
-                          <button 
+                          <button
                             className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
                             onClick={() => openUpdateModal(account)}
                           >
                             <FiEdit size={18} />
                           </button>
-                          <button 
+                          <button
                             className="p-2 hover:bg-gray-100 rounded-full text-gray-500"
                             onClick={() => openDeleteModal(account)}
                           >
@@ -442,7 +442,7 @@ const MobileAccounts = () => {
               </div>
             ))}
           </div>
-          
+
           {/* Account Pagination */}
           <div className="flex items-center justify-between">
           <Link
@@ -485,7 +485,7 @@ const MobileAccounts = () => {
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Create New Mobile Account</h2>
-                <button 
+                <button
                   onClick={() => {
                     setShowModal(false)
                     setError("")
@@ -497,13 +497,13 @@ const MobileAccounts = () => {
                   <FiX size={24} />
                 </button>
               </div>
-              
+
               {error && (
                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                   {error}
                 </div>
               )}
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="selectCompany" className="block text-sm font-medium text-gray-700 mb-1">
@@ -520,7 +520,7 @@ const MobileAccounts = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
                     Mobile Number
@@ -534,7 +534,7 @@ const MobileAccounts = () => {
                     placeholder="Enter mobile number"
                   />
                 </div>
-                
+
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     onClick={() => {
@@ -547,7 +547,7 @@ const MobileAccounts = () => {
                   >
                     Cancel
                   </button>
-                  
+
                   <button
                     onClick={handleCreateAccount}
                     disabled={isSubmitting}
@@ -569,7 +569,7 @@ const MobileAccounts = () => {
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Update Mobile Account</h2>
-                <button 
+                <button
                   onClick={() => {
                     setShowUpdateModal(false)
                     setUpdateError("")
@@ -579,13 +579,13 @@ const MobileAccounts = () => {
                   <FiX size={24} />
                 </button>
               </div>
-              
+
               {updateError && (
                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
                   {updateError}
                 </div>
               )}
-              
+
               <div className="space-y-4">
                 <div>
                   <label htmlFor="updateSelectCompany" className="block text-sm font-medium text-gray-700 mb-1">
@@ -602,7 +602,7 @@ const MobileAccounts = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="updateMobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
                     Mobile Number
@@ -616,7 +616,7 @@ const MobileAccounts = () => {
                     placeholder="Enter mobile number"
                   />
                 </div>
-                
+
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     onClick={() => {
@@ -627,7 +627,7 @@ const MobileAccounts = () => {
                   >
                     Cancel
                   </button>
-                  
+
                   <button
                     onClick={handleUpdateAccount}
                     disabled={isUpdating}
@@ -649,7 +649,7 @@ const MobileAccounts = () => {
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Delete Mobile Account</h2>
-                <button 
+                <button
                   onClick={() => {
                     setShowDeleteModal(false)
                     setDeleteAccountId("")
@@ -660,14 +660,14 @@ const MobileAccounts = () => {
                   <FiX size={24} />
                 </button>
               </div>
-              
+
               <div className="mb-6">
                 <p className="text-gray-700">
                   Are you sure you want to delete the account with number <span className="font-semibold">{deleteAccountNumber}</span>?
                   This action cannot be undone.
                 </p>
               </div>
-              
+
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
@@ -679,7 +679,7 @@ const MobileAccounts = () => {
                 >
                   Cancel
                 </button>
-                
+
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting}
