@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import { toast, ToastContainer } from 'react-toastify'; // Import toast
-import 'react-toastify/dist/ReactToastify.css'; // Import toast CSS
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CreditPage() {
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     customerName: "",
     customerNumber: "",
@@ -51,7 +51,10 @@ export default function CreditPage() {
   // Fetch data when company is selected
   useEffect(() => {
     const fetchCompanyDetails = async () => {
-      if (!formData.company) return;
+      if (!formData.company) {
+        setCompanyData([]);
+        return;
+      }
 
       try {
         const response = await axios.get(
@@ -60,17 +63,22 @@ export default function CreditPage() {
           )}`
         );
 
-        if (response.data.success) {
-          setCompanyData(response.data.data);
+        if (response.data && response.data.success) {
+          // Make sure we have valid data before setting it
+          setCompanyData(response.data.data || []);
           setFormData((prev) => ({
             ...prev,
             selectedAccount: "",
             selectedNumber: "",
           }));
+        } else {
+          // If the response is not successful, set empty array
+          setCompanyData([]);
         }
       } catch (error) {
         console.error("Error fetching company details:", error);
         toast.error("Failed to fetch company details");
+        setCompanyData([]);
       }
     };
 
@@ -79,14 +87,30 @@ export default function CreditPage() {
 
   // Handle number selection and update credit amount
   const handleNumberSelection = (selectedMobile) => {
+    if (!selectedMobile) {
+      setFormData((prev) => ({
+        ...prev,
+        selectedAccount: "",
+        selectedNumber: "",
+      }));
+      return;
+    }
+
     const selectedAccount = companyData.find(
-      (item) => item.mobileNumber === selectedMobile
+      (item) => item && item.mobileNumber === selectedMobile
     );
-    if (selectedAccount) {
+
+    if (selectedAccount && selectedAccount.totalAmount !== undefined) {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
         selectedNumber: selectedAccount.totalAmount.toString(),
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        selectedAccount: selectedMobile,
+        selectedNumber: "0", // Default to "0" if totalAmount is undefined
       }));
     }
   };
@@ -108,8 +132,8 @@ export default function CreditPage() {
       );
 
       let foundCustomers = [];
-      if (response.data.success) {
-        foundCustomers = response.data.data;
+      if (response.data && response.data.success) {
+        foundCustomers = response.data.data || [];
       }
 
       // If the search input could be a partial phone number, try to match by mobile number directly
@@ -124,12 +148,14 @@ export default function CreditPage() {
           );
 
           if (
+            numberResponse.data &&
             numberResponse.data.success &&
+            numberResponse.data.data &&
             numberResponse.data.data.length > 0
           ) {
             // Add any new results that weren't already found
             numberResponse.data.data.forEach((customer) => {
-              if (!foundCustomers.some((c) => c._id === customer._id)) {
+              if (!foundCustomers.some((c) => c && c._id === customer._id)) {
                 foundCustomers.push(customer);
               }
             });
@@ -146,6 +172,8 @@ export default function CreditPage() {
     } catch (error) {
       console.error("Error fetching customer suggestions:", error);
       toast.error("Error searching for customers");
+      setCustomerSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
@@ -162,10 +190,10 @@ export default function CreditPage() {
 
   // Client-side filtering for number search if the API doesn't handle it
   useEffect(() => {
-    if (searchTerm && /^\d+$/.test(searchTerm)) {
+    if (searchTerm && /^\d+$/.test(searchTerm) && customerSuggestions.length > 0) {
       // If the search term is numeric, filter results client-side as well
       const filteredResults = customerSuggestions.filter((customer) =>
-        customer.mobileNumber.includes(searchTerm)
+        customer && customer.mobileNumber && customer.mobileNumber.includes(searchTerm)
       );
 
       if (filteredResults.length > 0) {
@@ -176,12 +204,14 @@ export default function CreditPage() {
 
   // Handle selection from dropdown
   const handleSelectCustomer = (customer) => {
+    if (!customer) return;
+
     setFormData((prev) => ({
       ...prev,
-      customerName: customer.customerName,
-      customerNumber: customer.mobileNumber,
+      customerName: customer.customerName || "",
+      customerNumber: customer.mobileNumber || "",
     }));
-    setSearchTerm(customer.customerName);
+    setSearchTerm(customer.customerName || "");
     setCustomerSuggestions([]);
     setShowSuggestions(false);
   };
@@ -268,10 +298,17 @@ export default function CreditPage() {
     }
   };
 
+  // Calculate total with null/undefined check
+  const calculateTotal = () => {
+    const currentBalance = Number(formData.selectedNumber || 0);
+    const newAmount = Number(formData.newAmount || 0);
+    return currentBalance + newAmount;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       {/* Add ToastContainer at the top of the component */}
-      <ToastContainer 
+      <ToastContainer
         position="top-center"
         autoClose={3000}
         hideProgressBar={false}
@@ -282,7 +319,7 @@ export default function CreditPage() {
         draggable
         pauseOnHover
       />
-      
+
       <h1 className="text-3xl font-bold text-center mb-8">Credit</h1>
 
       {/* Show validation error message if exists */}
@@ -309,16 +346,18 @@ export default function CreditPage() {
             {showSuggestions && customerSuggestions.length > 0 && (
               <ul className="absolute z-10 w-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
                 {customerSuggestions.map((customer) => (
-                  <li
-                    key={customer._id}
-                    className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
-                    onClick={() => handleSelectCustomer(customer)}
-                  >
-                    <span className="font-medium">{customer.customerName}</span>
-                    <span className="text-gray-600">
-                      {customer.mobileNumber}
-                    </span>
-                  </li>
+                  customer && customer._id ? (
+                    <li
+                      key={customer._id}
+                      className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
+                      onClick={() => handleSelectCustomer(customer)}
+                    >
+                      <span className="font-medium">{customer.customerName || ""}</span>
+                      <span className="text-gray-600">
+                        {customer.mobileNumber || ""}
+                      </span>
+                    </li>
+                  ) : null
                 ))}
               </ul>
             )}
@@ -375,11 +414,13 @@ export default function CreditPage() {
               required
             >
               <option value="">Select a number</option>
-              {companyData.map((item) => (
-                <option key={item._id} value={item.mobileNumber}>
-                  {item.mobileNumber}
-                </option>
-              ))}
+              {companyData && companyData.length > 0 ? companyData.map((item) => (
+                item && item._id && item.mobileNumber ? (
+                  <option key={item._id} value={item.mobileNumber}>
+                    {item.mobileNumber}
+                  </option>
+                ) : null
+              )) : null}
             </select>
           </div>
         </div>
@@ -392,13 +433,12 @@ export default function CreditPage() {
             <input
               type="string"
               className="w-full border rounded-md p-2"
-              value={formData.selectedNumber}
+              value={formData.selectedNumber || ""}
               readOnly
             />
 
             <p>
-              Total:{" "}
-              {Number(formData.newAmount) + Number(formData.selectedNumber)}
+              Total: {calculateTotal()}
             </p>
           </div>
           <div>
@@ -411,7 +451,7 @@ export default function CreditPage() {
                 setFormData({
                   ...formData,
                   newAmount:
-                    e.target.value === "" ? "" : Number(e.target.value),
+                    e.target.value === "" ? 0 : Number(e.target.value),
                 })
               }
             />
