@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/user/verify", { name: username });
+      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/user/verify", { name: username });
 
       if (response.data.success) {
         setSuccess("User verified. Please set a new password.");
