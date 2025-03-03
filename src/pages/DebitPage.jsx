@@ -229,12 +229,26 @@ export default function DebitPage() {
               type="number"
               className="w-full border rounded-md p-2"
               value={formData.amount === 0 ? '' : formData.amount}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  amount: e.target.value === '' ? '' : Number(e.target.value),
-                })
-              }
+              onChange={(e) => {
+                const value = e.target.value === '' ? 0 : Number(e.target.value);
+                if (value >= 0) {
+                  setFormData({
+                    ...formData,
+                    amount: value,
+                  });
+                } else {
+                  // Optional: Display error or notification to user
+                  // alert("Negative values are not allowed");
+                  toast.error('Negative values are not allowed')
+                }
+              }}
+              min="0"
+              // onChange={(e) =>
+              //   setFormData({
+              //     ...formData,
+              //     amount: e.target.value === '' ? '' : Number(e.target.value),
+              //   })
+              // }
             />
           </div>
         </div>

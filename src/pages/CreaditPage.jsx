@@ -291,6 +291,7 @@ export default function CreditPage() {
     }
 
     try {
+      console.log("data", formData)
       const response = await axios.post(
         `https://bebsa.ahadalichowdhury.online/api/credit`,
         formData
@@ -487,13 +488,13 @@ export default function CreditPage() {
             <input
               type="string"
               className="w-full border rounded-md p-2"
-              value={formData.previousAmount || ''}
+              value={formData.previousAmount || ''}  
               readOnly
             />
 
             <p>Total: {calculateTotal()}</p>
           </div>
-          <div>
+          {/* <div>
             <label className=" text-sm font-medium mb-1">CreditAmount</label>
             <input
               type="number"
@@ -506,7 +507,29 @@ export default function CreditPage() {
                 })
               }
             />
-          </div>
+          </div> */}
+          <div>
+  <label className="text-sm font-medium mb-1">CreditAmount</label>
+  <input
+    type="number"
+    className="w-full border rounded-md p-2"
+    value={formData.newAmount === 0 ? '' : formData.newAmount}
+    onChange={(e) => {
+      const value = e.target.value === '' ? 0 : Number(e.target.value);
+      if (value >= 0) {
+        setFormData({
+          ...formData,
+          newAmount: value,
+        });
+      } else {
+        // Optional: Display error or notification to user
+        // alert("Negative values are not allowed");
+        toast.error('Negative values are not allowed')
+      }
+    }}
+    min="0"
+  />
+</div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">

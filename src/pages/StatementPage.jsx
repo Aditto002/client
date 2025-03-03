@@ -7,6 +7,8 @@ import {
   FiChevronUp,
   FiDownload,
   FiX,
+  FiEdit,
+  FiTrash,
 } from 'react-icons/fi'
 // Import jsPDF correctly
 import { jsPDF } from 'jspdf'
@@ -82,6 +84,7 @@ const StatementPage = () => {
       if (endDate) params.endDate = endDate
       if (selectCompany) params.selectCompany = selectCompany
       if (selectedNumber) params.selectedNumber = selectedNumber
+      
 
       // Use the new API endpoint for account data
       const response = await axios.get(
@@ -182,7 +185,7 @@ const StatementPage = () => {
   // Update the getTransactionBalance function
   const getTransactionBalance = (transaction) => {
     // Use the balance field calculated by the backend
-    return transaction.balance || 0
+    return transaction.totalBalance || 0
   }
   // Function to open update modal with pre-populated data
   const handleUpdateClick = (transaction) => {
@@ -236,15 +239,21 @@ const StatementPage = () => {
   }
 
   // Function to open delete confirmation
-  const handleDeleteClick = (id) => {
+  const handleDeleteClick = (id,isCredit) => {
     // Check if we got a valid ID
     if (!id) {
       console.error('Invalid ID for deletion', id)
       alert('Error: Invalid ID for deletion')
       return
     }
+    const delethandle ={
+      id,
+      isCredit,
+      selectedCompany:selectCompany,
+      selectedAccount:selectedNumber
+    }
 
-    setDeleteId(id)
+    setDeleteId(delethandle)
     setShowDeleteConfirm(true)
   }
 
@@ -256,9 +265,9 @@ const StatementPage = () => {
         alert('Error: Delete ID is missing')
         return
       }
-
-      await axios.delete(
-        `https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`
+      console.log("data", deleteId)
+      await axios.post(
+        `https://bebsa.ahadalichowdhury.online/api/credit/statement-delete`,deleteId
       )
       setShowDeleteConfirm(false)
       fetchTransactions() // Refresh the data
@@ -513,6 +522,9 @@ const StatementPage = () => {
               <th className="text-left py-4 px-4 text-gray-500 font-medium">
                 Entry By
               </th>
+              <th className="text-left py-4 px-4 text-gray-500 font-medium">
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -545,6 +557,23 @@ const StatementPage = () => {
                 <td className="py-4 px-4 text-gray-700">
                   {transaction.entryBy || ''}
                 </td>
+                <td className="py-4 px-4 text-gray-700">
+                  {index === 0 ? (
+                    <button
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => handleDeleteClick(transaction._id,transaction.isCredit)}
+                    >
+                      <FiTrash size={18} />
+                    </button>
+                  ) : (
+                    <button
+                      className="text-gray-300 cursor-not-allowed"
+                      disabled
+                    >
+                      <FiTrash size={18} />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -553,7 +582,7 @@ const StatementPage = () => {
 
       {/* Mobile View - Updated to match new column order */}
       <div className="md:hidden space-y-4">
-        {transactions.map((transaction) => (
+        {transactions.map((transaction, index) => (
           <div
             key={transaction._id || transaction.id}
             className="bg-white rounded-lg shadow-sm border border-gray-200"
@@ -584,22 +613,32 @@ const StatementPage = () => {
                     Balance: {getTransactionBalance(transaction)}
                   </div>
                 </div>
-                <button
-                  onClick={() =>
-                    setExpandedRow(
-                      expandedRow === (transaction._id || transaction.id)
-                        ? null
-                        : transaction._id || transaction.id
-                    )
-                  }
-                  className="text-gray-500"
-                >
-                  {expandedRow === (transaction._id || transaction.id) ? (
-                    <FiChevronUp size={20} />
-                  ) : (
-                    <FiChevronDown size={20} />
+                <div className="flex items-center">
+                  {index === 0 && (
+                    <button
+                      className="text-gray-500 hover:text-gray-700 mr-2"
+                      onClick={() => handleDeleteClick(transaction._id,transaction.isCredit)}
+                    >
+                      <FiTrash size={18} />
+                    </button>
                   )}
-                </button>
+                  <button
+                    onClick={() =>
+                      setExpandedRow(
+                        expandedRow === (transaction._id || transaction.id)
+                          ? null
+                          : transaction._id || transaction.id
+                      )
+                    }
+                    className="text-gray-500"
+                  >
+                    {expandedRow === (transaction._id || transaction.id) ? (
+                      <FiChevronUp size={20} />
+                    ) : (
+                      <FiChevronDown size={20} />
+                    )}
+                  </button>
+                </div>
               </div>
 
               {expandedRow === (transaction._id || transaction.id) && (
