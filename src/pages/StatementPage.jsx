@@ -687,7 +687,7 @@ const StatementPage = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between mt-5">
+      {/* <div className="flex items-center justify-between mt-5">
         <Link
           to="/"
           className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600"
@@ -717,7 +717,7 @@ const StatementPage = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Update Modal */}
       {showUpdateModal && (
