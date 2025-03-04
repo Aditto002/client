@@ -731,7 +731,7 @@ const DailyTransaction = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
           <Link
             to="/"
              className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
@@ -766,7 +766,7 @@ const DailyTransaction = () => {
             </div>
           )}
             </div>
-          </div>
+          </div> */}
         </>
       )}
 
