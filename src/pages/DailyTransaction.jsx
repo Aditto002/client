@@ -86,6 +86,7 @@ const DailyTransaction = () => {
       // Check if response data has expected structure
       if (response.data && response.data.data) {
         setTransactions(response.data.data.customers || []);
+        console.log("data",response.data.data.customers)
         setTotalAmount(response.data.data);
         console.log("object", totalAmount);
         setTotalPages(response.data.data.pagination?.totalPages || 1);
@@ -125,7 +126,7 @@ const DailyTransaction = () => {
           params: params,
         }
       );
-
+         
       if (response.data && response.data.data && response.data.data.customers) {
         setPDFData(response.data.data.customers);
       } else {
@@ -552,7 +553,7 @@ const DailyTransaction = () => {
                         </span>
                       </td>
                       <td className="py-4 px-6 text-gray-700 text-center">
-                        {transaction.selectedNumber || "N/A"}
+                        {transaction.totalBalance || "N/A"}
                       </td>
                       <td className="py-4 px-6 text-center">
                         <span className="px-3 py-1 rounded text-sm font-medium">
@@ -687,7 +688,7 @@ const DailyTransaction = () => {
                           <div className="text-sm text-gray-500">Balance:</div>
                           <div>
                             <span className="px-3 py-1 rounded text-sm font-medium">
-                              {transaction.selectedNumber || "N/A"}
+                              {transaction.totalBalance || "N/A"}
                             </span>
                           </div>
                         </div>
