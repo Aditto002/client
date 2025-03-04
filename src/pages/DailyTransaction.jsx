@@ -829,7 +829,7 @@ const DailyTransaction = () => {
                 <input
                   type="text"
                   name="selectedNumber"
-                  value={updateData.selectedNumber}
+                  value={updateData.totalBalance}
                   onChange={handleUpdateChange}
                   className="w-full p-2 border rounded"
                 />
