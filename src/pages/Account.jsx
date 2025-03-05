@@ -453,7 +453,7 @@ const MobileAccounts = () => {
             </Link>
             <div>
 
-          {accounts.length > 0 && (
+          {/* {accounts.length > 0 && (
             <div className="mt-4 flex justify-center items-center space-x-2">
               <button
                 onClick={() => setAccountsCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -473,7 +473,7 @@ const MobileAccounts = () => {
                 <FiChevronRight />
               </button>
             </div>
-          )}
+          )} */}
             </div>
 
           </div>

@@ -586,7 +586,7 @@ const Customer = () => {
                Back
             </Link>
            
-            <div >
+            {/* <div >
 
           {customers.length > 0 && (
             <div className="mt-4 flex justify-center items-center space-x-2">
@@ -609,7 +609,7 @@ const Customer = () => {
               </button>
             </div>
           )}
-            </div>
+            </div> */}
           </div>
         </div>
 

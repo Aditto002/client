@@ -457,7 +457,7 @@ const Balance = () => {
             </Link>
             <div>
 
-        <div className="mt-4 flex justify-center items-center space-x-2">
+        {/* <div className="mt-4 flex justify-center items-center space-x-2">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
@@ -475,7 +475,7 @@ const Balance = () => {
           >
             <FiChevronRight />
           </button>
-        </div>
+        </div> */}
             </div>
         </div>
         
