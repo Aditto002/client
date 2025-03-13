@@ -476,7 +476,7 @@ export default function SingleDuePage() {
           </tbody>
           <tfoot>
             <tr className="font-bold">
-              <td className="p-2">Total</td>
+              <td className="p-2">মোট</td>
               <td className="text-right p-2 text-emerald-600">
                 ৳ {customerData.totalTaken}
               </td>
