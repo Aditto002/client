@@ -1,4 +1,6 @@
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -118,23 +120,18 @@ export default function SingleDuePage() {
   const generateSummaryText = () => {
     if (!customerData) return "";
 
-    let summary = `Customer: ${customerData.customerName}\n`;
-    summary += `Mobile: ${customerData.mobileNumber}\n`;
-    summary += `Due Balance: ৳ ${customerData.dueBalance}\n`;
-    summary += `Total Given: ৳ ${customerData.totalGiven}\n`;
-    summary += `Total Taken: ৳ ${customerData.totalTaken}\n\n`;
-    summary += "Transaction History:\n";
+    // Ensure transactions are sorted by date in descending order (latest first)
+    const latestTransaction = customerData.transactions.sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    )[0];
+    // console.log(latestTransaction);
 
-    customerData.transactions.forEach((transaction, index) => {
-      summary += `${index + 1}. Date: ${formatDate(transaction.date)}\n`;
-      if (transaction.given > 0) {
-        summary += `   Credit: ৳ ${transaction.taken}\n`;
-      }
-      if (transaction.taken > 0) {
-        summary += `   Debit: ৳ ${transaction.given}\n`;
-      }
-      summary += `   Balance: ৳ ${transaction.balance}\n\n`;
-    });
+    let summary = `প্রিয়, ${customerData.customerName}\n`;
+    summary += `আজকে কেনা: ৳ ${latestTransaction?.taken || 0}\n`;
+    summary += `মোট বাকি:  ৳ ${customerData.dueBalance}\n\n`;
+
+    summary += `দেব টেলিকম,\n`;
+    summary += `শেরপুর, মৌলভীবাজার।`;
 
     return summary;
   };
@@ -154,12 +151,126 @@ export default function SingleDuePage() {
     }
   };
 
+  const downloadTransactionData = () => {
+    if (!customerData) return;
+
+    try {
+      console.log("Download PDF function called");
+
+      // Initialize jsPDF - use portrait orientation
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      doc.setFontSize(18);
+
+      // Center "Deb Telecom"
+      const title = "Deb Telecom";
+      doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
+
+      // Center "Moulvibazar Road, Afrozganj Bazar Sherpur"
+      const address = "Moulvibazar Road, Afrozganj Bazar Sherpur";
+      doc.setFontSize(12);
+      doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
+
+      // Center "Customer Transaction Register"
+      const subtitle = "Due History";
+      doc.setFontSize(14);
+      doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
+
+      // Add report metadata
+      doc.setFontSize(11);
+
+      const customerNameText = `Customer: ${customerData.customerName}`;
+      doc.text(customerNameText, 15, 48);
+
+      const mobileNumberText = `Mobile: ${customerData.mobileNumber}`;
+      doc.text(mobileNumberText, 15, 54);
+
+      const dueBalanceText = `Due Balance: ${customerData.dueBalance}`;
+      doc.text(dueBalanceText, 15, 60);
+
+      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      doc.text(
+        generatedText,
+        pageWidth - 15 - doc.getTextWidth(generatedText),
+        48
+      );
+
+      // Format transaction data for the table
+      const tableData = customerData.transactions.map((transaction) => [
+        formatDate(transaction.date),
+        transaction.taken ? `${transaction.taken}` : "-",
+        transaction.given ? `${transaction.given}` : "-",
+        `${transaction.balance}`,
+        transaction.notes || "-",
+      ]);
+
+      // Add total row
+      tableData.push([
+        "Total",
+        `${customerData.totalTaken}`,
+        `${customerData.totalGiven}`,
+        `${customerData.dueBalance}`,
+        "",
+      ]);
+
+      // Define table columns
+      const headers = ["Date", "Taken", "Given", "Balance", "Notes"];
+
+      // Add transactions table with auto table and capture the final Y position
+      let finalY;
+      autoTable(doc, {
+        startY: 70,
+        head: [headers],
+        body: tableData,
+        theme: "grid",
+        headStyles: { fillColor: [66, 66, 66] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { top: 48 },
+        didDrawPage: (data) => {
+          finalY = data.cursor.y; // This captures the Y position after the table is drawn
+        },
+      });
+
+      // Add horizontal line after the table
+      doc.setDrawColor(0); // Black color
+      doc.setLineWidth(0.5); // Line width
+      doc.line(10, finalY + 10, pageWidth - 10, finalY + 10); // Draw line
+
+      // Add signature lines
+      doc.setFontSize(10);
+      doc.text("Customer Signature", 20, finalY + 25);
+      doc.text(
+        "Authorized Signature",
+        pageWidth - 20 - doc.getTextWidth("Authorized Signature"),
+        finalY + 25
+      );
+
+      // Draw signature lines
+      doc.line(20, finalY + 28, 70, finalY + 28);
+      doc.line(pageWidth - 70, finalY + 28, pageWidth - 20, finalY + 28);
+
+      // Save the PDF
+      const fileName = `${customerData.customerName}_transactions.pdf`;
+      console.log("Saving PDF with filename:", fileName);
+      doc.save(fileName);
+
+      console.log("PDF download complete");
+      // You can add toast notification here if you have toast library
+      // toast.success("PDF downloaded successfully");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      // toast.error("Error generating PDF: " + error.message);
+    }
+  };
+
   // Skeleton loading UI
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="bg-yellow-300 p-4 rounded-t-lg">
+        <div className="bg-yellow-300 p-4 rounded-t-lg flex justify-between items-center">
           <h1 className="text-xl font-bold">Due History</h1>
+          <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
         </div>
         <div className="bg-yellow-50 p-4 rounded-lg mb-4">
           <div className="flex justify-between items-center">
@@ -178,10 +289,18 @@ export default function SingleDuePage() {
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left p-2">তারিখ</th>
-                <th className="text-right p-2">নিয়েছি</th>
-                <th className="text-right p-2">দিয়েছি</th>
-                <th className="text-right p-2">ব্যালেন্স</th>
+                <th className="text-left p-2 text-lg font-normal font-sans">
+                  তারিখ
+                </th>
+                <th className="text-right p-2 text-lg font-normal font-sans">
+                  নিয়েছি
+                </th>
+                <th className="text-right p-2 text-lg font-normal font-sans">
+                  দিয়েছি
+                </th>
+                <th className="text-right p-2 text-lg font-normal font-sans">
+                  ব্যালেন্স
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -246,8 +365,29 @@ export default function SingleDuePage() {
         </div>
       )}
 
-      <div className="bg-yellow-300 p-4 rounded-t-lg">
+      <div className="bg-yellow-300 p-4 rounded-t-lg flex justify-between items-center">
         <h1 className="text-xl font-bold">Due History</h1>
+        <button
+          onClick={downloadTransactionData}
+          className="p-2 rounded-full hover:bg-yellow-400 transition-colors"
+          title="Download transaction data"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
       </div>
       <div className="bg-yellow-50 p-4 rounded-lg mb-4">
         <div className="flex justify-between items-center">
@@ -257,7 +397,7 @@ export default function SingleDuePage() {
             </div>
             <div>{customerData.mobileNumber}</div>
             <div className="text-red-500">
-              Branch: ৳ {customerData.dueBalance}
+              পাবো: ৳ {customerData.dueBalance}
             </div>
           </div>
           <div className="flex gap-2">
@@ -283,7 +423,21 @@ export default function SingleDuePage() {
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           onClick={() => setShowViewModal(true)}
         >
-          View Summary
+          কাস্টমারকে বাকির ম্যাসেজ পাঠান
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            className="inline-block w-4 h-4 ml-2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 19l7-7-7-7M5 12h14"
+            />
+          </svg>
         </button>
       </div>
 
@@ -291,21 +445,30 @@ export default function SingleDuePage() {
         <table className="w-full">
           <thead>
             <tr className="border-b">
-              <th className="text-left p-2">Date</th>
-              <th className="text-right p-2">Credit</th>
-              <th className="text-right p-2">Debit</th>
-              <th className="text-right p-2">Balance</th>
+              <th className="text-left p-2 text-lg font-normal font-sans">
+                তারিখ
+              </th>
+              <th className="text-right p-2 text-lg font-normal font-sans">
+                নিয়েছি
+              </th>
+              <th className="text-right p-2 text-lg font-normal font-sans">
+                দিয়েছি
+              </th>
+              <th className="text-right p-2 text-lg font-normal font-sans">
+                ব্যালেন্স
+              </th>
             </tr>
           </thead>
           <tbody>
             {customerData.transactions.map((transaction) => (
               <tr key={transaction._id} className="border-b">
                 <td className="p-2">{formatDate(transaction.date)}</td>
+                {/* <p>{transaction.given}</p> */}
                 <td className="text-right p-2 text-emerald-600">
-                  {transaction.taken > 0 ? `৳ ${transaction.given}` : "-"}
+                  {transaction.taken > 0 ? `৳ ${transaction.taken}` : "-"}
                 </td>
                 <td className="text-right p-2 text-red-600">
-                  {transaction.given > 0 ? `৳ ${transaction.taken}` : "-"}
+                  {transaction.given > 0 ? `৳ ${transaction.given}` : "-"}
                 </td>
                 <td className="text-right p-2">৳ {transaction.balance}</td>
               </tr>
@@ -315,10 +478,10 @@ export default function SingleDuePage() {
             <tr className="font-bold">
               <td className="p-2">Total</td>
               <td className="text-right p-2 text-emerald-600">
-                ৳ {customerData.totalGiven}
+                ৳ {customerData.totalTaken}
               </td>
               <td className="text-right p-2 text-red-600">
-                ৳ {customerData.totalTaken}
+                ৳ {customerData.totalGiven}
               </td>
               <td className="text-right p-2">৳ {customerData.dueBalance}</td>
             </tr>
