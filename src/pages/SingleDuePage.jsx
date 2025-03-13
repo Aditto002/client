@@ -128,10 +128,10 @@ export default function SingleDuePage() {
     customerData.transactions.forEach((transaction, index) => {
       summary += `${index + 1}. Date: ${formatDate(transaction.date)}\n`;
       if (transaction.given > 0) {
-        summary += `   Credit: ৳ ${transaction.given}\n`;
+        summary += `   Credit: ৳ ${transaction.taken}\n`;
       }
       if (transaction.taken > 0) {
-        summary += `   Debit: ৳ ${transaction.taken}\n`;
+        summary += `   Debit: ৳ ${transaction.given}\n`;
       }
       summary += `   Balance: ৳ ${transaction.balance}\n\n`;
     });
@@ -302,10 +302,10 @@ export default function SingleDuePage() {
               <tr key={transaction._id} className="border-b">
                 <td className="p-2">{formatDate(transaction.date)}</td>
                 <td className="text-right p-2 text-emerald-600">
-                  {transaction.given > 0 ? `৳ ${transaction.given}` : "-"}
+                  {transaction.taken > 0 ? `৳ ${transaction.given}` : "-"}
                 </td>
                 <td className="text-right p-2 text-red-600">
-                  {transaction.taken > 0 ? `৳ ${transaction.taken}` : "-"}
+                  {transaction.given > 0 ? `৳ ${transaction.taken}` : "-"}
                 </td>
                 <td className="text-right p-2">৳ {transaction.balance}</td>
               </tr>
@@ -384,7 +384,6 @@ export default function SingleDuePage() {
                   Cancel
                 </button>
                 <button
-                  type="submit"
                   type="submit"
                   disabled={transactionLoading}
                   className="px-4 py-2 bg-red-500 text-white rounded"
