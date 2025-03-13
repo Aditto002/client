@@ -127,7 +127,7 @@ export default function SingleDuePage() {
     // console.log(latestTransaction);
 
     let summary = `প্রিয়, ${customerData.customerName}\n`;
-    summary += `আজকে কেনা: ৳ ${latestTransaction?.taken || 0}\n`;
+    summary += `আজকে কেনা: ৳ ${latestTransaction?.given || 0}\n`;
     summary += `মোট বাকি:  ৳ ${customerData.dueBalance}\n\n`;
 
     summary += `দেব টেলিকম,\n`;
