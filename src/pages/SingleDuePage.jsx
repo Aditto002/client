@@ -400,7 +400,7 @@ export default function SingleDuePage() {
               পাবো: ৳ {customerData.dueBalance}
             </div>
           </div>
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <a
               href={`tel:${customerData.mobileNumber}`}
               className="p-2 rounded-full bg-gray-200"
@@ -413,7 +413,7 @@ export default function SingleDuePage() {
             >
               <span className="sr-only">Message</span>💬
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
 
