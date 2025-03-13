@@ -11,6 +11,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import HomePage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import StatementPage from "../pages/StatementPage";
+import SingleDuePage from "../pages/SingleDuePage";
 
 const ProtectedRoute = ({ children }) => {
   // Check if user is logged in (you'll need to implement this based on your auth system)
@@ -49,6 +50,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <StatementPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/due",
+    element: (
+      <ProtectedRoute>
+        <SingleDuePage />
       </ProtectedRoute>
     ),
   },

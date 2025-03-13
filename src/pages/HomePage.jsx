@@ -7,7 +7,7 @@ export default function HomePage() {
   const menuItems = [
     { title: "Credit", path: "/creditpage" },
     { title: "Debit", path: "/debitpage" },
-    { title: "DUE", path: "/duepage", disabled: true }, // Mark "DUE" as disabled
+    { title: "DUE", path: "/duepage" }, // Mark "DUE" as disabled
     { title: "Customers", path: "/customer" },
     { title: "Accounts", path: "/account" },
     { title: "Daily Transaction Register", path: "/dailytransation" },
