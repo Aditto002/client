@@ -204,9 +204,7 @@ const DuePage = () => {
                   <td className="py-4 px-6 text-gray-700">
                     {customer.mobileNumber}
                   </td>
-                  <td className="py-4 px-6 text-gray-700">
-                    {customer.dueBalance || 0}
-                  </td>
+                  
                   <td className="py-4 px-6 text-center">
                     <button
                       className="bg-blue-500 py-2 px-4 rounded text-white hover:bg-blue-600 transition-colors"
