@@ -180,9 +180,7 @@ const DuePage = () => {
                 <th className="text-left py-4 px-6 text-gray-500 font-medium">
                   Mobile Number
                 </th>
-                <th className="text-left py-4 px-6 text-gray-500 font-medium">
-                  Due Balance
-                </th>
+                
                 <th className="text-center py-4 px-6 text-gray-500 font-medium">
                   Action
                 </th>
@@ -275,14 +273,7 @@ const DuePage = () => {
                       <div className="text-sm text-gray-900">
                         {customer.mobileNumber}
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-sm text-gray-500">Due Balance:</div>
-                      <div className="text-sm text-gray-900">
-                        {customer.dueBalance || 0}
-                      </div>
-                    </div>
-                    <div className="pt-3 flex justify-center">
+                    </div> <div className="pt-3 flex justify-center">
                       <button
                         className="bg-blue-500 py-2 px-4 rounded text-white hover:bg-blue-600 transition-colors w-full"
                         onClick={() => handleDueClick(customer.mobileNumber)}
