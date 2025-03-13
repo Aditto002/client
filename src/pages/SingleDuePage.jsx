@@ -178,10 +178,10 @@ export default function SingleDuePage() {
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left p-2">Date</th>
-                <th className="text-right p-2">Credit</th>
-                <th className="text-right p-2">Debit</th>
-                <th className="text-right p-2">Balance</th>
+                <th className="text-left p-2">তারিখ</th>
+                <th className="text-right p-2">নিয়েছি</th>
+                <th className="text-right p-2">দিয়েছি</th>
+                <th className="text-right p-2">ব্যালেন্স</th>
               </tr>
             </thead>
             <tbody>
@@ -330,13 +330,13 @@ export default function SingleDuePage() {
           className="bg-red-500 text-white p-4 rounded-lg text-center font-bold"
           onClick={() => setShowGiveModal(true)}
         >
-          Give
+          দিচ্ছি
         </button>
         <button
           className="bg-emerald-500 text-white p-4 rounded-lg text-center font-bold"
           onClick={() => setShowTakeModal(true)}
         >
-          Take
+          নিচ্ছি
         </button>
       </div>
       <div className="flex justify-center mt-6">
