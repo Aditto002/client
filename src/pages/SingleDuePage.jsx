@@ -37,6 +37,7 @@ export default function SingleDuePage() {
       const response = await axios.get(
         `https://bebsa.ahadalichowdhury.online/api/transactions/${mobileNumber}`
       );
+      console.log("data",response.data)
       setCustomerData(response.data);
       setLoading(false);
     } catch (err) {
