@@ -12,8 +12,12 @@ import {
   FiX,
   FiUser,
   FiPhone,
+  FiDownload,
+  FiPlus,
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Toast = ({ message, type, onClose }) => {
   const bgColor =
@@ -52,6 +56,8 @@ const DuePage = () => {
   const [customersCurrentPage, setCustomersCurrentPage] = useState(1);
   const [customersTotalPages, setCustomersTotalPages] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [PDFData, setPDFData] = useState([]);
   const [toast, setToast] = useState({
     show: false,
     message: "",
@@ -113,6 +119,49 @@ const DuePage = () => {
     }
   };
 
+  // Function to fetch all customers for PDF
+  const fetchAllCustomersForPDF = async () => {
+    try {
+      setIsDownloading(true);
+      // First try to get all customers
+      const response = await axios.get(
+        "https://bebsa.ahadalichowdhury.online/api/customers/all"
+      );
+      
+      if (response.data && Array.isArray(response.data.data)) {
+        return response.data.data;
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (error) {
+      console.error("Error fetching all customers:", error);
+      
+      // If the /all endpoint fails, try using the paginated endpoint with a large limit
+      try {
+        console.log("Trying alternative approach with pagination");
+        const paginatedResponse = await axios.get(
+          "https://bebsa.ahadalichowdhury.online/api/customers",
+          {
+            params: {
+              page: 1,
+              limit: 1000 // Request a large number of customers
+            }
+          }
+        );
+        
+        if (paginatedResponse.data && Array.isArray(paginatedResponse.data.data)) {
+          return paginatedResponse.data.data;
+        } else {
+          throw new Error("Invalid data format from paginated endpoint");
+        }
+      } catch (secondError) {
+        console.error("Both endpoints failed:", secondError);
+        showToast("Failed to fetch customers for PDF", "error");
+        throw new Error("Could not fetch customer data from any endpoint");
+      }
+    }
+  };
+
   // Handle search input change
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -133,6 +182,73 @@ const DuePage = () => {
     }
   };
 
+  // Function to download PDF of all customers
+  const downloadCustomersPDF = async () => {
+    try {
+      console.log("Download PDF function called");
+      setIsDownloading(true);
+      
+      // Fetch all customers for PDF
+      const allCustomers = await fetchAllCustomersForPDF();
+      console.log("Fetched customers for PDF:", allCustomers?.length || 0);
+      
+      if (!allCustomers || allCustomers.length === 0) {
+        console.error("No customer data available to download");
+        showToast("No customer data available to download", "error");
+        return;
+      }
+      
+      // Initialize jsPDF - use portrait orientation
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Add content to PDF (your existing code)
+      doc.setFontSize(18);
+      const title = "Deb Telecom";
+      doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
+      
+      // Rest of your PDF generation code...
+      
+      // Format customer data for the table
+      const tableData = allCustomers.map((customer, index) => [
+        index + 1,
+        customer.customerName || '',
+        customer.mobileNumber || '',
+      ]);
+      
+      // Add the table
+      autoTable(doc, {
+        startY: 60,
+        head: [["S.No", "Customer Name", "Mobile Number"]],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [66, 66, 66] },
+        alternateRowStyles: { fillColor: [240, 240, 240] },
+        margin: { top: 48 },
+      });
+      
+      // Save the PDF - this line is critical
+      const fileName = `customers_list_${new Date().toISOString().split('T')[0]}.pdf`;
+      console.log("Attempting to save PDF with filename:", fileName);
+      
+      // Try using this more direct approach:
+      doc.save(fileName);
+      
+      console.log("PDF download complete");
+      showToast("Customer list downloaded successfully", "success");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      showToast("Error generating PDF: " + error.message, "error");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  // Handle create new customer
+  const handleCreateCustomer = () => {
+    navigate("/customer/create");
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen bg-slate-200">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -145,13 +261,39 @@ const DuePage = () => {
           />
         )}
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Customers</h1>
-          <div className="h-1 w-24 bg-blue-500 mx-auto rounded-full"></div>
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Customers</h1>
+            <div className="h-1 w-24 bg-blue-500 mx-auto rounded-full"></div>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex space-x-3">
+            <button
+              onClick={handleCreateCustomer}
+              className="bg-red-500 py-2 px-4 rounded-lg text-white hover:bg-red-600 transition-colors font-medium shadow-sm flex items-center gap-2"
+            >
+              {/* <FiPlus size={16} /> */}
+              Due History
+            </button>
+            <button
+              onClick={downloadCustomersPDF}
+              disabled={isDownloading}
+              className="bg-blue-500 py-2 px-4 rounded-lg text-white hover:bg-blue-600 transition-colors font-medium shadow-sm flex items-center gap-2 disabled:bg-blue-300"
+            >
+              {isDownloading ? (
+                <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+              ) : (
+                <FiDownload size={16} />
+              )}
+              {isDownloading ? "Downloading..." : "Download PDF"}
+            </button>
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div> </div>
             {/* Search Input with Icon */}
             <div className="relative w-full max-w-lg">
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -165,6 +307,13 @@ const DuePage = () => {
                 className="pl-12 p-4 border border-gray-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
+            <button
+              onClick={handleCreateCustomer}
+              className="bg-green-500 md:ml-10 py-2 px-4 rounded-lg text-white hover:bg-green-600 transition-colors font-medium shadow-sm flex items-center gap-2"
+            >
+              <FiPlus size={16} />
+              Create
+            </button>
           </div>
 
           {isSearching && (
