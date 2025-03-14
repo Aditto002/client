@@ -293,7 +293,7 @@ export default function SingleDuePage() {
                 <th className="text-left p-2 text-lg font-normal font-sans">
                   তারিখ
                 </th>
-                <th className="text-right p-2 text-lg font-normal font-sans">
+                <th className="text-right p-2 text-lg font-normal font-sans text-green-600 ">
                   নিয়েছি
                 </th>
                 <th className="text-right p-2 text-lg font-normal font-sans">
@@ -308,15 +308,15 @@ export default function SingleDuePage() {
               {[...Array(4)].map((_, index) => (
                 <tr key={index} className="border-b">
                   <td className="p-2">
-                    <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    <div className="h-4 py-2 bg-gray-200 rounded w-32 animate-pulse"></div>
                   </td>
-                  <td className="text-right p-2">
+                  <td className="text-right p-2 py-2">
                     <div className="h-4 bg-gray-200 rounded w-16 ml-auto animate-pulse"></div>
                   </td>
-                  <td className="text-right p-2">
+                  <td className="text-right p-2 py-2">
                     <div className="h-4 bg-gray-200 rounded w-16 ml-auto animate-pulse"></div>
                   </td>
-                  <td className="text-right p-2">
+                  <td className="text-right p-2 py-2">
                     <div className="h-4 bg-gray-200 rounded w-16 ml-auto animate-pulse"></div>
                   </td>
                 </tr>
@@ -446,13 +446,13 @@ export default function SingleDuePage() {
         <table className="w-full">
           <thead>
             <tr className="border-b">
-              <th className="text-left p-2 text-lg font-normal font-sans">
+              <th className="text-left p-2 text-lg font-normal font-sans ">
                 তারিখ
               </th>
-              <th className="text-right p-2 text-lg font-normal font-sans">
+              <th className=" p-2 text-lg font-normal font-sans text-green-600 text-right">
                 নিয়েছি
               </th>
-              <th className="text-right p-2 text-lg font-normal font-sans">
+              <th className="text-right p-2 text-lg font-normal font-sans text-red-600">
                 দিয়েছি
               </th>
               <th className="text-right p-2 text-lg font-normal font-sans">
@@ -462,17 +462,24 @@ export default function SingleDuePage() {
           </thead>
           <tbody>
             {customerData.transactions.map((transaction) => (
-              <tr key={transaction._id} className="border-b">
-                <td className="p-2">{formatDate(transaction.date)}</td>
+              <>
+              <tr key={transaction._id} className="border-b shadow-md ">
+              <td className="p-2 py-3">
+                      {`${formatDate(transaction.date)}`}
+                       <br />
+                       {transaction.notes ? `নোট: ${transaction.notes}` : ''}
+                        </td>
                 {/* <p>{transaction.given}</p> */}
-                <td className="text-right p-2 text-emerald-600">
+                <td className=" p-2 py-3 text-emerald-700 bg-green-100 text-right">
                   {transaction.taken > 0 ? `৳ ${transaction.taken}` : "-"}
                 </td>
-                <td className="text-right p-2 text-red-600">
+                <td className="text-right p-2 py-3 text-red-600 bg-red-100">
                   {transaction.given > 0 ? `৳ ${transaction.given}` : "-"}
                 </td>
-                <td className="text-right p-2">৳ {transaction.balance}</td>
+                <td className="text-right py-5 p-3">৳ {transaction.balance}</td>
               </tr>
+               <tr className="h-3"></tr>
+               </>
             ))}
           </tbody>
           <tfoot>
