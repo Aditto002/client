@@ -75,6 +75,9 @@ const DailyTransaction = () => {
       // Only add date parameters if they're not empty
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
+//       if (startDate) params.startDate = new Date(startDate).toISOString().split('T')[0].replace(/-/g, '/');
+// if (endDate) params.endDate = new Date(endDate).toISOString().split('T')[0].replace(/-/g, '/');
+
 
       const response = await axios.get(
         "https://bebsa.ahadalichowdhury.online/api/credit/personal",
@@ -218,7 +221,7 @@ const DailyTransaction = () => {
         transaction.newAmount || "",
         transaction.customerNumber || "",
         transaction.selectedAccount || "",
-        transaction.selectedNumber || "",
+        transaction.totalBalance || "",// change selectedNumber
         transaction.remarks || "",
       ]);
 
@@ -387,7 +390,7 @@ const DailyTransaction = () => {
       />
       
       <div className="text-center mb-10 mt-10">
-        <h1 className="text-4xl font-bold">Daily Transaction</h1>
+        <h1 className="text-4xl font-bold">Daily Transaction Register</h1>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6">
@@ -429,6 +432,7 @@ const DailyTransaction = () => {
               onChange={(e) => setTempStartDate(e.target.value)}
               className="p-2 border rounded w-40 sm:w-52 md:w-60"
             />
+
           </div>
 
           <div className="flex flex-col">

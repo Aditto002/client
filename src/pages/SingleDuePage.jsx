@@ -132,7 +132,8 @@ export default function SingleDuePage() {
     summary += `মোট বাকি:  ৳ ${customerData.dueBalance}\n\n`;
 
     summary += `দেব টেলিকম,\n`;
-    summary += `শেরপুর, মৌলভীবাজার।`;
+    summary += `শেরপুর, মৌলভীবাজার।\n`;
+    summary += `MOBILE-01733-402030`;
 
     return summary;
   };

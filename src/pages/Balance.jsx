@@ -182,7 +182,9 @@ const Balance = () => {
       alert("Error deleting record: " + error.message)
     }
   }
-
+// const formatDate = (date) => {
+//   return new Date(date).toLocaleDateString("en-GB"); // Format: dd/mm/yyyy
+// };
   const downloadTransactionsPDF = async () => {
     try {
       console.log("Download PDF function called");
@@ -212,7 +214,7 @@ const Balance = () => {
       doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
   
       // Center "Daily Transaction Register"
-      const subtitle = "Daily Transaction Register";
+      const subtitle = "Total Balance";
       doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
   
       // Add report metadata
@@ -223,10 +225,20 @@ const Balance = () => {
         : "Date Range: All dates";
       doc.text(dateRangeText, (pageWidth - doc.getTextWidth(dateRangeText)) / 2, 48);
   
-      const totalAmountText = `Total Amount: ${totalAmount?.totalAmount || 0}`;
+      const totalAmountText = `Total Amount: ${totalAmount?.totalSum || 0}`; ///totalAmount
       doc.text(totalAmountText, (pageWidth - doc.getTextWidth(totalAmountText)) / 2, 54);
   
-      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      // const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      // doc.text(generatedText, (pageWidth - doc.getTextWidth(generatedText)) / 2, 60);
+      const formatDate = (date) => {
+        return new Date(date).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+      };
+      
+      const generatedText = `Generated on: ${formatDate(new Date())}`;
       doc.text(generatedText, (pageWidth - doc.getTextWidth(generatedText)) / 2, 60);
       
       // Format transaction data for the table - use PDFData instead of transactions
@@ -286,7 +298,7 @@ const Balance = () => {
   return (
     <div className="container mx-auto p-4 max-w-5xl">
         <div className="text-center mb-10 mt-10">
-          <h1 className="text-4xl font-bold">Balance</h1>
+          <h1 className="text-4xl font-bold">Total Balance</h1>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6 md:mb-8">
@@ -296,8 +308,8 @@ const Balance = () => {
               <label className="block text-sm font-light mb-1">From</label>
               <input
                 type="date"
-                value={tempStartDate}
-                onChange={(e) => setTempStartDate(e.target.value)}
+                value={tempStartDate}//tempStartDate
+                onChange={(e) => setTempStartDate(e.target.value)}///(e) => setTempStartDate(e.target.value)
                 className="p-2 border rounded w-40 sm:w-52 md:w-60"
               />
             </div>
