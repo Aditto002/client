@@ -76,12 +76,12 @@ const [endDate, setEndDate] = useState("");
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://bebsa.ahadalichowdhury.online/api/transactions`,
+        `https://bebsa.ahadalichowdhury.online/api/transactions/${mobileNumber}`,
         {
           params: {
-            search,
-            startDate: startDate,
-            endDate: endDate
+          
+            from: startDate,
+            to: endDate
           }
         }
       );
