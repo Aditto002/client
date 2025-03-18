@@ -14,6 +14,8 @@ import {
   FiPhone,
   FiDownload,
   FiPlus,
+  FiEdit,
+  FiTrash,
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
@@ -24,8 +26,8 @@ const Toast = ({ message, type, onClose }) => {
     type === "success"
       ? "bg-green-500"
       : type === "error"
-      ? "bg-red-500"
-      : "bg-blue-500";
+        ? "bg-red-500"
+        : "bg-blue-500";
 
   const Icon =
     type === "success" ? FiCheck : type === "error" ? FiAlertCircle : FiInfo;
@@ -94,7 +96,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       setIsSubmitting(true);
-      
+
       const payload = {
         name: name.trim(),
         mobileNumber: mobileNumber.trim(),
@@ -127,7 +129,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-90vh overflow-y-auto animate-fade-in-up">
         <div className="flex justify-between items-center border-b p-4">
           <h2 className="text-xl font-bold text-gray-800">Create New Customer</h2>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
           >
@@ -264,7 +266,237 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
     </div>
   );
 };
+// UpdateCustomerModal Component
+const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
+  const [name, setName] = useState(customer?.customerName || "");
+  const [mobileNumber, setMobileNumber] = useState(customer?.mobileNumber || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
+  // Update form when customer changes
+  useEffect(() => {
+    if (customer) {
+      setName(customer.customerName || "");
+      setMobileNumber(customer.mobileNumber || "");
+    }
+  }, [customer]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Validate form
+    if (!name.trim()) {
+      setError("Customer name is required");
+      return;
+    }
+
+    if (!mobileNumber.trim()) {
+      setError("Mobile number is required");
+      return;
+    }
+
+    // Mobile number validation - only numbers and proper length
+    if (!/^\d{10,11}$/.test(mobileNumber.trim())) {
+      setError("Please enter a valid 10-11 digit mobile number");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const payload = {
+        name: name.trim(),
+        mobileNumber: mobileNumber.trim()
+      };
+
+      const response = await axios.put(
+        `https://bebsa.ahadalichowdhury.online/api/transactions/users/${customer._id}`,
+        payload
+      );
+      
+      if (response.data) {
+        onSuccess("Customer updated successfully");
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      setError(error.response?.data?.message || "Failed to update customer");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-90vh overflow-y-auto animate-fade-in-up">
+        <div className="flex justify-between items-center border-b p-4">
+          <h2 className="text-xl font-bold text-gray-800">Update Customer</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {/* Customer Name */}
+            <div className="space-y-2">
+              <label htmlFor="update-name" className="block text-sm font-medium text-gray-700">
+                Customer Name
+              </label>
+              <input
+                type="text"
+                id="update-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter customer name"
+              />
+            </div>
+
+            {/* Mobile Number */}
+            <div className="space-y-2">
+              <label htmlFor="update-mobileNumber" className="block text-sm font-medium text-gray-700">
+                Mobile Number
+              </label>
+              <input
+                type="text"
+                id="update-mobileNumber"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter mobile number"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-blue-500 rounded-lg text-white hover:bg-blue-600 transition-colors font-medium disabled:bg-blue-300"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                  Updating...
+                </div>
+              ) : (
+                "Update"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+const DeleteConfirmationModal = ({ isOpen, onClose, customer, onSuccess }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      setError("");
+
+      const response = await axios.delete(
+        `https://bebsa.ahadalichowdhury.online/api/transactions/users/${customer._id}`
+      );
+
+      if (response.data) {
+        onSuccess("Customer deleted successfully");
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      setError(error.response?.data?.message || "Failed to delete customer");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full animate-fade-in-up">
+        <div className="flex justify-between items-center border-b p-4">
+          <h2 className="text-xl font-bold text-gray-800">Confirm Deletion</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <FiX size={24} />
+          </button>
+        </div>
+
+        <div className="p-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+
+          <div className="text-center mb-6">
+            <div className="bg-red-100 text-red-500 p-3 rounded-full inline-block mb-4">
+              <FiAlertCircle size={32} />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Delete Customer</h3>
+            <p className="text-gray-600">
+              Are you sure you want to delete <span className="font-medium">{customer?.customerName}</span>? This action cannot be undone.
+            </p>
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+              disabled={isDeleting}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="px-6 py-2 bg-red-500 rounded-lg text-white hover:bg-red-600 transition-colors font-medium disabled:bg-red-300"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent mr-2"></div>
+                  Deleting...
+                </div>
+              ) : (
+                "Delete"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 const DuePage = () => {
   const navigate = useNavigate();
 
@@ -280,6 +512,9 @@ const DuePage = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [PDFData, setPDFData] = useState([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [toast, setToast] = useState({
     show: false,
     message: "",
@@ -308,111 +543,78 @@ const DuePage = () => {
   };
 
   // Function to fetch customers from the API
- // Function to fetch customers from the API
- const fetchCustomers = async () => {
-  try {
-    setIsSearching(true);
-    
-    const params = {};
-    
-    // Only add search parameter if it has a value
-    if (searchQuery) {
-      params.search = searchQuery;
-    }
-    
-    const response = await axios.get(
-      "https://bebsa.ahadalichowdhury.online/api/get-transactions",
-      { params }
-    );
-    
-    // Log the entire response to see its structure
-    console.log("Full response:", response.data.totalDueBalance);
-    console.log("Response data type:", typeof response.data);
-    setTotalDueAmount(response.data)
-    
-    if (response.data) {
-      // Handle different possible response structures
-      if (Array.isArray(response.data)) {
-        setCustomers(response.data);
-      } else if (response.data.customers && Array.isArray(response.data.customers)) {
-        setCustomers(response.data.customers);
-      } else if (response.data.data && Array.isArray(response.data.data)) {
-        setCustomers(response.data.data);
-      } else if (typeof response.data === 'object' && response.data !== null) {
-        // If response.data is an object but not in expected format,
-        // try to extract any array property that might contain the customers
-        const possibleArrays = Object.values(response.data).filter(val => Array.isArray(val));
-        if (possibleArrays.length > 0) {
-          // Use the first array found
-          setCustomers(possibleArrays[0]);
+  // Function to fetch customers from the API
+  const fetchCustomers = async () => {
+    try {
+      setIsSearching(true);
+
+      const params = {};
+
+      // Only add search parameter if it has a value
+      if (searchQuery) {
+        params.search = searchQuery;
+      }
+
+      const response = await axios.get(
+        "https://bebsa.ahadalichowdhury.online/api/get-transactions",
+        { params }
+      );
+
+      // Log the entire response to see its structure
+      console.log("Full response:", response.data.totalDueBalance);
+      console.log("Response data type:", typeof response.data);
+      setTotalDueAmount(response.data)
+
+      if (response.data) {
+        // Handle different possible response structures
+        if (Array.isArray(response.data)) {
+          setCustomers(response.data);
+        } else if (response.data.customers && Array.isArray(response.data.customers)) {
+          setCustomers(response.data.customers);
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          setCustomers(response.data.data);
+        } else if (typeof response.data === 'object' && response.data !== null) {
+          // If response.data is an object but not in expected format,
+          // try to extract any array property that might contain the customers
+          const possibleArrays = Object.values(response.data).filter(val => Array.isArray(val));
+          if (possibleArrays.length > 0) {
+            // Use the first array found
+            setCustomers(possibleArrays[0]);
+          } else {
+            console.error("No arrays found in response data:", response.data);
+            setCustomers([]);
+            showToast("Could not find customer data in response", "error");
+          }
         } else {
-          console.error("No arrays found in response data:", response.data);
+          console.error("Unexpected response format:", response.data);
           setCustomers([]);
-          showToast("Could not find customer data in response", "error");
+          showToast("Invalid response format", "error");
         }
       } else {
-        console.error("Unexpected response format:", response.data);
+        console.error("No data in response:", response);
         setCustomers([]);
-        showToast("Invalid response format", "error");
+        showToast("No data received from server", "error");
       }
-    } else {
-      console.error("No data in response:", response);
-      setCustomers([]);
-      showToast("No data received from server", "error");
-    }
-  } catch (error) {
-    console.error("Error fetching customers:", error.response || error);
-    
-    // More detailed error message
-    const errorMessage = error.response?.data?.message || error.message || "Failed to load customers";
-    showToast(errorMessage, "error");
-    setCustomers([]);
-  } finally {
-    setIsSearching(false);
-  }
-};
-  // Function to fetch all customers for PDF
-  // const fetchAllCustomersForPDF = async () => {
-  //   try {
-  //     setIsDownloading(true);
-  //     // First try to get all customers
-  //     const response = await axios.get(
-  //       "http://localhost:5000/api/get-transactions"
-  //     );
-      
-  //     if (response.data && Array.isArray(response.data.data)) {
-  //       return response.data.data;
-  //     } else {
-  //       throw new Error("Invalid data format");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching all customers:", error);
-      
-  //     // If the /all endpoint fails, try using the paginated endpoint with a large limit
-  //     try {
-  //       console.log("Trying alternative approach with pagination");
-  //       const paginatedResponse = await axios.get(
-  //         "http://localhost:5000/api/get-transactions",
-  //         {
-  //           params: {
-             
-  //           }
-  //         }
-  //       );
-        
-  //       if (paginatedResponse.data && Array.isArray(paginatedResponse.data.data)) {
-  //         return paginatedResponse.data.data;
-  //       } else {
-  //         throw new Error("Invalid data format from paginated endpoint");
-  //       }
-  //     } catch (secondError) {
-  //       console.error("Both endpoints failed:", secondError);
-  //       showToast("Failed to fetch customers for PDF", "error");
-  //       throw new Error("Could not fetch customer data from any endpoint");
-  //     }
-  //   }
-  // };
+    } catch (error) {
+      console.error("Error fetching customers:", error.response || error);
 
+      // More detailed error message
+      const errorMessage = error.response?.data?.message || error.message || "Failed to load customers";
+      showToast(errorMessage, "error");
+      setCustomers([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  const openUpdateModal = (customer) => {
+    setSelectedCustomer(customer);
+    setIsUpdateModalOpen(true);
+  };
+
+  const openDeleteModal = (customer) => {
+    setSelectedCustomer(customer);
+    setIsDeleteModalOpen(true);
+  };
   // Handle search input change
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -438,35 +640,35 @@ const DuePage = () => {
   //   try {
   //     console.log("Download PDF function called");
   //     setIsDownloading(true);
-      
+
   //     // Fetch all customers for PDF
   //     const allCustomers = await fetchAllCustomersForPDF();
   //     console.log("Fetched customers for PDF:", allCustomers?.length || 0);
-      
+
   //     if (!allCustomers || allCustomers.length === 0) {
   //       console.error("No customer data available to download");
   //       showToast("No customer data available to download", "error");
   //       return;
   //     }
-      
+
   //     // Initialize jsPDF - use portrait orientation
   //     const doc = new jsPDF('p', 'mm', 'a4');
   //     const pageWidth = doc.internal.pageSize.getWidth();
-      
+
   //     // Add content to PDF (your existing code)
   //     doc.setFontSize(18);
   //     const title = "Deb Telecom";
   //     doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
-      
+
   //     // Rest of your PDF generation code...
-      
+
   //     // Format customer data for the table
   //     const tableData = allCustomers.map((customer, index) => [
   //       index + 1,
   //       customer.customerName || '',
   //       customer.mobileNumber || '',
   //     ]);
-      
+
   //     // Add the table
   //     autoTable(doc, {
   //       startY: 60,
@@ -477,14 +679,14 @@ const DuePage = () => {
   //       alternateRowStyles: { fillColor: [240, 240, 240] },
   //       margin: { top: 48 },
   //     });
-      
+
   //     // Save the PDF - this line is critical
   //     const fileName = `customers_list_${new Date().toISOString().split('T')[0]}.pdf`;
   //     console.log("Attempting to save PDF with filename:", fileName);
-      
+
   //     // Try using this more direct approach:
   //     doc.save(fileName);
-      
+
   //     console.log("PDF download complete");
   //     showToast("Customer list downloaded successfully", "success");
   //   } catch (error) {
@@ -497,17 +699,17 @@ const DuePage = () => {
   const fetchAllCustomersForPDF = async () => {
     try {
       setIsDownloading(true);
-      
+
       // Use the same endpoint that works for regular fetch
       const response = await axios.get(
-        "http://localhost:5000/api/get-transactions"
+        "https://bebsa.ahadalichowdhury.online/api/get-transactions"
       );
-      
+
       console.log("PDF data response:", response.data);
-      
+
       // Use the same logic as in fetchCustomers for consistency
       let customersData = [];
-      
+
       if (response.data) {
         if (Array.isArray(response.data)) {
           customersData = response.data;
@@ -528,7 +730,7 @@ const DuePage = () => {
       } else {
         throw new Error("No data in response");
       }
-      
+
       return customersData;
     } catch (error) {
       console.error("Error fetching all customers:", error);
@@ -536,47 +738,47 @@ const DuePage = () => {
       throw error;
     }
   };
-  
+
   // Improved PDF download function
   const downloadCustomersPDF = async () => {
     try {
       console.log("Download PDF function called");
       setIsDownloading(true);
-      
+
       // Fetch all customers for PDF
       const allCustomers = await fetchAllCustomersForPDF();
       console.log("Fetched customers for PDF:", allCustomers?.length || 0);
-      
+
       if (!allCustomers || allCustomers.length === 0) {
         console.error("No customer data available to download");
         showToast("No customer data available to download", "error");
         return;
       }
-      
+
       // Initialize jsPDF - use portrait orientation
       const doc = new jsPDF('p', 'mm', 'a4');
       const pageWidth = doc.internal.pageSize.getWidth();
-      
+
       // Add content to PDF
       doc.setFontSize(18);
       const title = "Deb Telecom";
       doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
       doc.setFontSize(16);
       const titles = "Customer Due";
-      doc.text(titles, (pageWidth - doc.getTextWidth(titles)) /2, 32);
-      
+      doc.text(titles, (pageWidth - doc.getTextWidth(titles)) / 2, 32);
+
       // Add total due amount if available
       if (totalDueAmount !== undefined) {
         doc.setFontSize(14);
         const totalDueText = `Total Due Balance: ${totalDueAmount.totalDueBalance}`;
         doc.text(totalDueText, (pageWidth - doc.getTextWidth(totalDueText)) / 2, 40);
       }
-      
+
       // Current date
       const currentDate = new Date().toLocaleDateString();
       doc.setFontSize(10);
       doc.text(`Date: ${currentDate}`, 14, 45);
-      
+
       // Format customer data for the table
       const tableData = allCustomers.map((customer, index) => [
         index + 1,
@@ -584,7 +786,7 @@ const DuePage = () => {
         customer.mobileNumber || '',
         customer.dueBalance || '0'  // Added due amount column
       ]);
-      
+
       // Add the table
       autoTable(doc, {
         startY: 60,
@@ -595,13 +797,13 @@ const DuePage = () => {
         alternateRowStyles: { fillColor: [240, 240, 240] },
         margin: { top: 48 },
       });
-      
+
       // Save the PDF
       const fileName = `customers_list_${new Date().toISOString().split('T')[0]}.pdf`;
       console.log("Attempting to save PDF with filename:", fileName);
-      
+
       doc.save(fileName);
-      
+
       console.log("PDF download complete");
       showToast("Customer list downloaded successfully", "success");
     } catch (error) {
@@ -617,17 +819,12 @@ const DuePage = () => {
     // Open the modal instead of navigating
     setIsCreateModalOpen(true);
   };
-  // const handleHistory = () => {
-  //   // Open the modal instead of navigating
-  //   // setIsCreateModalOpen(true);
-  //   // navigate.n
-  // };
 
-  
+
 
   return (
     <div className="bg-gray-50 min-h-screen bg-slate-200">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Toast Notification */}
         {toast.show && (
           <Toast
@@ -636,21 +833,40 @@ const DuePage = () => {
             onClose={() => setToast({ ...toast, show: false })}
           />
         )}
-         <CreateCustomerModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={(message) => {
-          showToast(message);
-          fetchCustomers();
-        }}
-      />
+        <CreateCustomerModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={(message) => {
+            showToast(message);
+            fetchCustomers();
+          }}
+        />
+        <UpdateCustomerModal
+          isOpen={isUpdateModalOpen}
+          onClose={() => setIsUpdateModalOpen(false)}
+          customer={selectedCustomer}
+          onSuccess={(message) => {
+            showToast(message);
+            fetchCustomers();
+          }}
+        />
+        
+        <DeleteConfirmationModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          customer={selectedCustomer}
+          onSuccess={(message) => {
+            showToast(message);
+            fetchCustomers();
+          }}
+        />
 
         <div className="md:flex justify-between items-center mb-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-800 mb-2 ">Customers</h1>
             <div className="h-1 w-24 bg-blue-500 mx-auto rounded-full mb-10 md:mb-0"></div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex space-x-3 ml-7 md:ml-0">
             <button
@@ -677,13 +893,13 @@ const DuePage = () => {
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex md:justify-end mb-4 md:mb-0">
-          <button
+            <button
               onClick={handleCreateCustomer}
               className="bg-green-500 md:ml-10 py-2 px-4 rounded-lg text-white hover:bg-green-600 transition-colors font-medium shadow-sm flex items-center gap-2"
             >
               <FiPlus size={16} />
               Create
-            </button>   
+            </button>
           </div>
           <div className="md:flex items-center justify-between mb-6">
             <div> </div>
@@ -700,10 +916,10 @@ const DuePage = () => {
                 className="pl-12 p-4 border border-gray-200 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
-                           
-          <div className="flex justify-end mt-5">
-            <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3>
-          </div>
+
+            <div className="flex justify-end mt-5">
+              <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3>
+            </div>
           </div>
 
           {isSearching && (
@@ -727,6 +943,9 @@ const DuePage = () => {
                     </th>
                     <th className="text-left py-4 px-6 text-gray-600 font-semibold shadow-md">
                       Due Amount
+                    </th>
+                    <th className="text-center py-4 px-6 text-gray-600 font-semibold shadow-md">
+                      Due
                     </th>
                     <th className="text-center py-4 px-6 text-gray-600 font-semibold shadow-md">
                       Action
@@ -768,6 +987,22 @@ const DuePage = () => {
                         >
                           Due
                         </button>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <div className="flex gap-2 text-center">
+                          <button
+                            className=" text-blue-500 hover:text-gray-700"
+                            onClick={() => openUpdateModal(customer)}
+                          >
+                            <FiEdit size={18} />
+                          </button>
+                          <button
+                            className="text-red-500 hover:text-gray-700"
+                            onClick={() => openDeleteModal(customer)}
+                          >
+                            <FiTrash size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -851,7 +1086,22 @@ const DuePage = () => {
                           >
                             Due
                           </button>
+                          <div className="flex">
+                            <button
+                              className="bg-gray-100 p-2 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors mr-2"
+                              onClick={() => openUpdateModal(customer)}
+                            >
+                              <FiEdit size={20} />
+                            </button>
+                            <button
+                              className="bg-gray-100 p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                              onClick={() => openDeleteModal(customer)}
+                            >
+                              <FiTrash size={20} />
+                            </button>
+                          </div>
                         </div>
+
                       </div>
                     ) : (
                       <div className="mt-2 flex justify-end">
