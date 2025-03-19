@@ -310,7 +310,7 @@ const handleDeleteSubmit = async () => {
       const mobileNumberText = `Mobile: ${customerData.mobileNumber}`;
       doc.text(mobileNumberText, 15, 54);
 
-      const dueBalanceText = `Due Balance: ${customerData.dueBalance}`;
+      const dueBalanceText = `Due Balance: ${customerData.total.total}`;
       doc.text(dueBalanceText, 15, 60);
 
       const generatedText = `Generated on: ${new Date().toLocaleString()}`;
@@ -319,6 +319,14 @@ const handleDeleteSubmit = async () => {
         pageWidth - 15 - doc.getTextWidth(generatedText),
         48
       );
+      if (startDate || endDate) {
+        const generatedText = `Date : ${startDate} To ${endDate}`;
+      doc.text(
+        generatedText,
+        pageWidth - 15 - doc.getTextWidth(generatedText),
+        58
+      );
+      }
 
       // Format transaction data for the table
       const tableData = customerData.transactions.map((transaction) => [
@@ -332,9 +340,9 @@ const handleDeleteSubmit = async () => {
       // Add total row
       tableData.push([
         "Total",
-        `${customerData.totalTaken}`,
-        `${customerData.totalGiven}`,
-        `${customerData.dueBalance}`,
+        `${customerData.total.taken}`,
+        `${customerData.total.given}`,
+        `${customerData.total.total}`,
         "",
       ]);
 
@@ -524,7 +532,7 @@ const handleDeleteSubmit = async () => {
             </div>
             <div>{customerData.mobileNumber}</div>
             <div className="text-red-500">
-              পাবো: ৳ {customerData.dueBalance}
+             {(customerData.total.total < 0) ?<span className="text-red-500">পাবে: ৳  {customerData.total.total * -1}</span> :<span className="text-green-500">পাবে: ৳ {customerData.total.total}</span>}
             </div>
           </div>
           {/* <div className="flex gap-2">
@@ -669,12 +677,12 @@ const handleDeleteSubmit = async () => {
             <tr className="font-bold">
               <td className="p-2">মোট</td>
               <td className="text-right p-2 text-emerald-600">
-                ৳ {customerData.totalTaken}
+                ৳ {customerData.total.taken}
               </td>
               <td className="text-right p-2 text-red-600">
-                ৳ {customerData.totalGiven}
+                ৳ {customerData.total.given}
               </td>
-              <td className="text-right p-2">৳ {customerData.dueBalance}</td>
+              <td className="text-right p-2">৳ {customerData.total.total}</td>
             </tr>
           </tfoot>
         </table>

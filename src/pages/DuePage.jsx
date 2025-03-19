@@ -974,12 +974,18 @@ const DuePage = () => {
                           {customer.mobileNumber}
                         </div>
                       </td>
-                      <td className="py-4 px-6 text-red-600 bg-red-50">
+                      {(customer.dueBalance<0)?<td className="py-4 px-6 text-green-600 bg-green-50">
+                        <div className="flex items-center gap-2">
+                          {/* <FiPhone size={16} className="text-gray-400" /> */}
+                          {customer.dueBalance *-1}
+                        </div>
+                      </td>:<td className="py-4 px-6 text-red-600 bg-red-50">
                         <div className="flex items-center gap-2">
                           {/* <FiPhone size={16} className="text-gray-400" /> */}
                           {customer.dueBalance}
                         </div>
-                      </td>
+                      </td>}
+                      
                       <td className="py-4 px-6 text-center">
                         <button
                           className="bg-blue-500 py-2 px-6 rounded-lg text-white hover:bg-blue-600 transition-colors font-medium shadow-sm hover:shadow-md"
