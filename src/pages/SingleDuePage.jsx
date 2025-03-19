@@ -26,6 +26,7 @@ export default function SingleDuePage() {
   const summaryTextRef = useRef(null);
   const [startDate, setStartDate] = useState("");
 const [endDate, setEndDate] = useState("");
+const [takedicchi,setTakedicchi] = useState(false);
 
   // Extract mobile number from URL query parameter
   const location = useLocation();
@@ -114,7 +115,10 @@ const [endDate, setEndDate] = useState("");
 
   // New function to handle opening the edit modal
 // Function to handle opening the edit modal
-const openEditModal = (transaction) => {
+const openEditModal = (transaction,given) => {
+  if(given>0){
+    setTakedicchi(true)
+  }
   setCurrentTransactionId(transaction._id);
   setAmount(transaction.taken > 0 ? transaction.taken : transaction.given);
   setNotes(transaction.notes || "");
@@ -644,7 +648,7 @@ const handleDeleteSubmit = async () => {
     <div className="flex gap-2 justify-center">
       <button
         className="text-blue-500 hover:text-blue-700"
-        onClick={() => openEditModal(transaction)}
+        onClick={() => openEditModal(transaction,`${transaction.given}`)}
       >
         <FiEdit size={18} />
       </button>
@@ -820,7 +824,7 @@ const handleDeleteSubmit = async () => {
             rows="3"
           />
         </div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="flex items-center">
             <input
               type="checkbox"
@@ -830,7 +834,7 @@ const handleDeleteSubmit = async () => {
             />
             <span className="text-gray-700">দিচ্ছি (Giving)</span>
           </label>
-        </div>
+        </div> */}
         <div className="flex justify-end gap-2">
           <button
             type="button"
