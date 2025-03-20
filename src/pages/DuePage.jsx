@@ -948,8 +948,8 @@ const DuePage = () => {
 
             <div className="flex flex-col gap-3 justify-end mt-5">
               {/* <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3> */}
-              <h3 className="bg-red-50 py-1 px-5 rounded ">Total pabo : <span className="text-red-500 font-bold ">{totalTake}</span> </h3>
-              <h3 className="bg-green-50 py-1 px-5 rounded ">Total dibo : <span className="text-green-500 font-bold ">{totalGive}</span> </h3>
+              <h3 className="bg-red-50 py-1 px-5 rounded ">মোট পাবো : <span className="text-red-500 font-bold ">{totalTake}</span> </h3>
+              <h3 className="bg-green-50 py-1 px-5 rounded ">মোট দিবো : <span className="text-green-500 font-bold ">{totalGive}</span> </h3>
             </div>
           </div>
 

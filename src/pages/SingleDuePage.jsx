@@ -313,19 +313,60 @@ const handleDeleteSubmit = async () => {
       const dueBalanceText = `Due Balance: ${customerData.total.total}`;
       doc.text(dueBalanceText, 15, 60);
 
-      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
-      doc.text(
-        generatedText,
-        pageWidth - 15 - doc.getTextWidth(generatedText),
-        48
-      );
-      if (startDate || endDate) {
-        const generatedText = `Date : ${startDate} To ${endDate}`;
-      doc.text(
-        generatedText,
-        pageWidth - 15 - doc.getTextWidth(generatedText),
-        58
-      );
+      // const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      // doc.text(
+      //   generatedText,
+      //   pageWidth - 15 - doc.getTextWidth(generatedText),
+      //   48
+      // );
+      // if (startDate || endDate) {
+      //   const generatedText = `Date : ${startDate} To ${endDate}`;
+      // doc.text(
+      //   generatedText,
+      //   pageWidth - 15 - doc.getTextWidth(generatedText),
+      //   58
+      // );
+      const currentDate = new Date();
+const day = String(currentDate.getDate()).padStart(2, '0');
+const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+const year = currentDate.getFullYear();
+const formattedDate = `${day}/${month}/${year}`;
+
+const generatedText = `Generated on: ${formattedDate}`;
+doc.text(
+  generatedText,
+  pageWidth - 15 - doc.getTextWidth(generatedText),
+  48
+);
+
+if (startDate || endDate) {
+  // Format startDate and endDate in dd/mm/yyyy
+  // Assuming startDate and endDate are Date objects or date strings
+  let formattedStartDate = '';
+  let formattedEndDate = '';
+  
+  if (startDate) {
+    const startDateObj = new Date(startDate);
+    const startDay = String(startDateObj.getDate()).padStart(2, '0');
+    const startMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
+    const startYear = startDateObj.getFullYear();
+    formattedStartDate = `${startDay}/${startMonth}/${startYear}`;
+  }
+  
+  if (endDate) {
+    const endDateObj = new Date(endDate);
+    const endDay = String(endDateObj.getDate()).padStart(2, '0');
+    const endMonth = String(endDateObj.getMonth() + 1).padStart(2, '0');
+    const endYear = endDateObj.getFullYear();
+    formattedEndDate = `${endDay}/${endMonth}/${endYear}`;
+  }
+  
+  const dateRangeText = `Date : ${formattedStartDate} To ${formattedEndDate}`;
+  doc.text(
+    dateRangeText,
+    pageWidth - 15 - doc.getTextWidth(dateRangeText),
+    58
+  );
       }
 
       // Format transaction data for the table
@@ -532,7 +573,7 @@ const handleDeleteSubmit = async () => {
             </div>
             <div>{customerData.mobileNumber}</div>
             <div className="text-red-500">
-             {(customerData.total.total < 0) ?<span className="text-green-500">পাবে: ৳  {customerData.total.total * -1}</span> :<span className="text-red-500">পাবে: ৳ {customerData.total.total}</span>}
+             {(customerData.total.total < 0) ?<span className="text-green-500">মোট দিবেন: ৳  {customerData.total.total * -1}</span> :<span className="text-red-500">মোট পাবেন: ৳ {customerData.total.total}</span>}
             </div>
           </div>
           {/* <div className="flex gap-2">

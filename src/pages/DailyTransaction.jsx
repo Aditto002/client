@@ -208,12 +208,24 @@ const DailyTransaction = () => {
         54
       );
 
-      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
-      doc.text(
-        generatedText,
-        (pageWidth - doc.getTextWidth(generatedText)) / 2,
-        60
-      );
+      // const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      // doc.text(
+      //   generatedText,
+      //   (pageWidth - doc.getTextWidth(generatedText)) / 2,
+      //   60
+      // );
+      const currentDate = new Date();
+const day = String(currentDate.getDate()).padStart(2, '0');
+const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+const year = currentDate.getFullYear();
+const formattedDate = `${day}/${month}/${year}`;
+
+const generatedText = `Generated on: ${formattedDate}`;
+doc.text(
+  generatedText,
+  (pageWidth - doc.getTextWidth(generatedText)) / 2,
+  60
+);
 
       // Format transaction data for the table
       const tableData = transactions.map((transaction) => [
