@@ -53,6 +53,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
   const [notes, setNotes] = useState("");
   const [dicchi, setDicchi] = useState(true); // Default to "Give" (dicchi: true)
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [error, setError] = useState("");
 
@@ -515,6 +516,8 @@ const DuePage = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [totalTake, setTotalTake] = useState(0);
+  const [totalGive, setTotalGive] = useState(0);
   const [toast, setToast] = useState({
     show: false,
     message: "",
@@ -585,6 +588,7 @@ const DuePage = () => {
             setCustomers([]);
             showToast("Could not find customer data in response", "error");
           }
+       
         } else {
           console.error("Unexpected response format:", response.data);
           setCustomers([]);
@@ -621,7 +625,29 @@ const DuePage = () => {
     setSearchQuery(value);
     setCustomersCurrentPage(1); // Reset to first page when search changes
   };
-
+  ////////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    const newTotalTake = customers.reduce((total, customer) => {
+      // For positive balances (amounts to be received/Pabo)
+      if (customer.dueBalance > 0) {
+        return total + customer.dueBalance;
+      }
+      return total;
+    }, 0);
+    
+    setTotalTake(newTotalTake);
+  }, [customers]);  
+  useEffect(() => {
+    const newTotalgive = customers.reduce((total, customer) => {
+      // For positive balances (amounts to be received/Pabo)
+      if (customer.dueBalance < 0) {
+        return total + (customer.dueBalance* -1);
+      }
+      return total;
+    }, 0);
+    
+    setTotalGive(newTotalgive);
+  }, [customers]);  
   // Handle Due button click - updated to use GET request
   const handleDueClick = async (mobileNumber) => {
     try {
@@ -770,21 +796,24 @@ const DuePage = () => {
       // Add total due amount if available
       if (totalDueAmount !== undefined) {
         doc.setFontSize(14);
-        const totalDueText = `Total Due Balance: ${totalDueAmount.totalDueBalance}`;
+        const totalDueText = `Total Pabo = ${totalTake}`;
         doc.text(totalDueText, (pageWidth - doc.getTextWidth(totalDueText)) / 2, 40);
+        doc.setFontSize(14);
+        const totalDueTex = `Total dibo = ${totalGive}`;
+        doc.text(totalDueTex, (pageWidth - doc.getTextWidth(totalDueTex)) / 2, 48);
       }
 
       // Current date
       const currentDate = new Date().toLocaleDateString();
       doc.setFontSize(10);
-      doc.text(`Date: ${currentDate}`, 14, 45);
+      doc.text(`Date: ${currentDate}`, 14, 52);
 
       // Format customer data for the table
       const tableData = allCustomers.map((customer, index) => [
         index + 1,
         customer.customerName || '',
         customer.mobileNumber || '',
-        customer.dueBalance || '0'  // Added due amount column
+        (customer.dueBalance <0 ? (customer.dueBalance*-1):customer.dueBalance) || '0'  // Added due amount column
       ]);
 
       // Add the table
@@ -917,8 +946,10 @@ const DuePage = () => {
               />
             </div>
 
-            <div className="flex justify-end mt-5">
-              <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3>
+            <div className="flex flex-col gap-3 justify-end mt-5">
+              {/* <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3> */}
+              <h3 className="bg-red-50 py-1 px-5 rounded ">Total pabo : <span className="text-red-500 font-bold ">{totalTake}</span> </h3>
+              <h3 className="bg-green-50 py-1 px-5 rounded ">Total dibo : <span className="text-green-500 font-bold ">{totalGive}</span> </h3>
             </div>
           </div>
 
@@ -956,6 +987,7 @@ const DuePage = () => {
                   {customers.map((customer, index) => (
                     <tr
                       key={customer._id}
+                    
                       className="border-t border-gray-200 hover:bg-blue-50 transition-colors"
                     >
                       <td className="py-4 px-6">
@@ -977,12 +1009,13 @@ const DuePage = () => {
                       {(customer.dueBalance<0)?<td className="py-4 px-6 text-green-600 bg-green-50">
                         <div className="flex items-center gap-2">
                           {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          {customer.dueBalance *-1}
+                          Dibo =  {customer.dueBalance *-1}
+                          
                         </div>
                       </td>:<td className="py-4 px-6 text-red-600 bg-red-50">
                         <div className="flex items-center gap-2">
                           {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          {customer.dueBalance}
+                          Pabo =  {customer.dueBalance}
                         </div>
                       </td>}
                       

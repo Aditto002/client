@@ -532,7 +532,7 @@ const handleDeleteSubmit = async () => {
             </div>
             <div>{customerData.mobileNumber}</div>
             <div className="text-red-500">
-             {(customerData.total.total < 0) ?<span className="text-red-500">পাবে: ৳  {customerData.total.total * -1}</span> :<span className="text-green-500">পাবে: ৳ {customerData.total.total}</span>}
+             {(customerData.total.total < 0) ?<span className="text-green-500">পাবে: ৳  {customerData.total.total * -1}</span> :<span className="text-red-500">পাবে: ৳ {customerData.total.total}</span>}
             </div>
           </div>
           {/* <div className="flex gap-2">
