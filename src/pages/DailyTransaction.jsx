@@ -219,8 +219,8 @@ const day = String(currentDate.getDate()).padStart(2, '0');
 const month = String(currentDate.getMonth() + 1).padStart(2, '0');
 const year = currentDate.getFullYear();
 const formattedDate = `${day}/${month}/${year}`;
-
-const generatedText = `Generated on: ${formattedDate}`;
+const formattedTime = currentDate.toLocaleTimeString();
+const generatedText = `Generated on: ${formattedDate} at ${formattedTime}`;
 doc.text(
   generatedText,
   (pageWidth - doc.getTextWidth(generatedText)) / 2,

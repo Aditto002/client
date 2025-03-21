@@ -332,10 +332,16 @@ const month = String(currentDate.getMonth() + 1).padStart(2, '0');
 const year = currentDate.getFullYear();
 const formattedDate = `${day}/${month}/${year}`;
 
-const generatedText = `Generated on: ${formattedDate}`;
+// Get current date and time
+const now = new Date();
+
+// Format date and time
+const formattedDateTime = `Generated on: ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`;
+
+// Add to PDF
 doc.text(
-  generatedText,
-  pageWidth - 15 - doc.getTextWidth(generatedText),
+  formattedDateTime,
+  pageWidth - 15 - doc.getTextWidth(formattedDateTime),
   48
 );
 

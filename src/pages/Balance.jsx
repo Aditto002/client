@@ -230,15 +230,24 @@ const Balance = () => {
   
       // const generatedText = `Generated on: ${new Date().toLocaleString()}`;
       // doc.text(generatedText, (pageWidth - doc.getTextWidth(generatedText)) / 2, 60);
-      const formatDate = (date) => {
-        return new Date(date).toLocaleDateString("en-GB", {
+      const formatDateTime = (date) => {
+        const formattedDate = new Date(date).toLocaleDateString("en-GB", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
         });
+        
+        // Get time in local format without seconds
+        const formattedTime = new Date(date).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true // Use 12-hour clock with AM/PM
+        });
+        
+        return `${formattedDate} ${formattedTime}`;
       };
       
-      const generatedText = `Generated on: ${formatDate(new Date())}`;
+      const generatedText = `Generated on: ${formatDateTime(new Date())}`;
       doc.text(generatedText, (pageWidth - doc.getTextWidth(generatedText)) / 2, 60);
       
       // Format transaction data for the table - use PDFData instead of transactions
