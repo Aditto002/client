@@ -292,8 +292,8 @@ const Balance = () => {
       
       // Save the PDF
       const fileName = startDate && endDate 
-        ? `daily_total-balance_${startDate}_to_${endDate}.pdf`
-        : `daily_total-balance.pdf`;
+        ? `DAILY_TOTAL_BALANCE_${startDate}_to_${endDate}.pdf`
+        : `DAILY_TOTAL_BALANCE.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
       
