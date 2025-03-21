@@ -278,14 +278,38 @@ doc.text(
       ); // Right-aligned
 
       // Save the PDF
-      const date = new Date();
-      const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' + 
-                           (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
-                           date.getFullYear();
-      const fileName =
-        startDate && endDate
-          ? `DAILY_TRANSACTION_SHEET_${startDate}_to_${endDate}.pdf`
-          : `DAILY_TRANSACTION_SHEET_${formattedDateS}.pdf`;
+      // Get your dates from wherever you're currently getting them
+// Then format them:
+const formatDate = (date) => {
+  const d = new Date(date);
+  return d.getDate().toString().padStart(2, '0') + '/' + 
+         (d.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+         d.getFullYear();
+};
+
+// Format both dates
+const formattedStartDate = startDate ? formatDate(startDate) : '';
+const formattedEndDate = endDate ? formatDate(endDate) : '';
+
+// Create current date for the default filename
+const today = new Date();
+const formattedToday = today.getDate().toString().padStart(2, '0') + '/' + 
+                       (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                       today.getFullYear();
+
+// Use the formatted dates in the filename
+const fileName =
+  startDate && endDate
+    ? `DAILY_TRANSACTION_SHEET_${formattedStartDate}_to_${formattedEndDate}.pdf`
+    : `DAILY_TRANSACTION_SHEET_${formattedToday}.pdf`;
+      // const date = new Date();
+      // const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' + 
+      //                      (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+      //                      date.getFullYear();
+      // const fileName =
+      //   startDate && endDate
+      //     ? `DAILY_TRANSACTION_SHEET_${startDate}_to_${endDate}.pdf`
+      //     : `DAILY_TRANSACTION_SHEET_${formattedDateS}.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
 
