@@ -893,7 +893,7 @@ doc.text(`Date: ${currentDate} Time: ${currentTime}`, 14, 52);
 
         <div className="md:flex justify-between items-center mb-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2 ">Customers</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2 ">CUSTOMER DUE</h1>
             <div className="h-1 w-24 bg-blue-500 mx-auto rounded-full mb-10 md:mb-0"></div>
           </div>
 
@@ -1010,13 +1010,13 @@ doc.text(`Date: ${currentDate} Time: ${currentTime}`, 14, 52);
                       {(customer.dueBalance<0)?<td className="py-4 px-6 text-green-600 bg-green-50">
                         <div className="flex items-center gap-2">
                           {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          Dibo =  {customer.dueBalance *-1}
+                          YOU WILL GIVE =  {customer.dueBalance *-1}
                           
                         </div>
                       </td>:<td className="py-4 px-6 text-red-600 bg-red-50">
                         <div className="flex items-center gap-2">
                           {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          Pabo =  {customer.dueBalance}
+                          YOU WILL GET =  {customer.dueBalance}
                         </div>
                       </td>}
                       
