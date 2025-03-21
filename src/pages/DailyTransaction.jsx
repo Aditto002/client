@@ -278,10 +278,14 @@ doc.text(
       ); // Right-aligned
 
       // Save the PDF
+      const date = new Date();
+      const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' + 
+                           (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                           date.getFullYear();
       const fileName =
         startDate && endDate
-          ? `transactions_${startDate}_to_${endDate}.pdf`
-          : `transactions_all_dates.pdf`;
+          ? `DAILY_TRANSACTION_SHEET_${startDate}_to_${endDate}.pdf`
+          : `DAILY_TRANSACTION_SHEET_${formattedDateS}.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
 
