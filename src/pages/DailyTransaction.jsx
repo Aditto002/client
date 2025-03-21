@@ -185,7 +185,7 @@ const DailyTransaction = () => {
       doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
 
       // Center "Daily Transaction Register"
-      const subtitle = "Daily Total Balance";
+      const subtitle = "Daily Transaction Register";
       doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
 
       // Add report metadata
@@ -280,8 +280,8 @@ doc.text(
       // Save the PDF
       const fileName =
         startDate && endDate
-          ? `transactions_${startDate}_to_${endDate}.pdf`
-          : `transactions_all_dates.pdf`;
+          ? `daily_total-balance_${startDate}_to_${endDate}.pdf`
+          : `daily_total-balance.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
 
