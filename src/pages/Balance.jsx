@@ -291,9 +291,14 @@ const Balance = () => {
       doc.text(grandTotalText, pageWidth - 20 - doc.getTextWidth(grandTotalText), finalY + 20); // Right-aligned
       
       // Save the PDF
-      const fileName = startDate && endDate 
-        ? `DAILY_TOTAL_BALANCE_${startDate}_to_${endDate}.pdf`
-        : `DAILY_TOTAL_BALANCE.pdf`;
+      const date = new Date();
+const formattedDate = date.getDate().toString().padStart(2, '0') + '/' + 
+                     (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                     date.getFullYear();
+
+const fileName = startDate && endDate 
+    ? `DAILY_TOTAL_BALANCE_${startDate}_to_${endDate}.pdf`
+    : `DAILY_TOTAL_BALANCE_${formattedDate}.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
       
