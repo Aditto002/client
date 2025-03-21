@@ -185,7 +185,7 @@ const DailyTransaction = () => {
       doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
 
       // Center "Daily Transaction Register"
-      const subtitle = "Daily Transaction Register";
+      const subtitle = "Daily Total Balance";
       doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
 
       // Add report metadata

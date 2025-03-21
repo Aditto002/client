@@ -804,11 +804,13 @@ const DuePage = () => {
       }
 
       // Current date
-      const currentDate = new Date().toLocaleDateString();
-const currentTime = new Date().toLocaleTimeString();
-doc.setFontSize(10);
-doc.text(`Date: ${currentDate} Time: ${currentTime}`, 14, 52);
-
+      const date = new Date();
+      const formattedDate = date.getDate().toString().padStart(2, '0') + '/' + 
+                            (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                            date.getFullYear();
+      const currentTime = date.toLocaleTimeString();
+      doc.setFontSize(10);
+      doc.text(`Date: ${formattedDate} Time: ${currentTime}`, 14, 52);
       // Format customer data for the table
       const tableData = allCustomers.map((customer, index) => [
         index + 1,
