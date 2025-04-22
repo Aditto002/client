@@ -326,18 +326,14 @@ const handleDeleteSubmit = async () => {
       //   pageWidth - 15 - doc.getTextWidth(generatedText),
       //   58
       // );
-      const currentDate = new Date();
-const day = String(currentDate.getDate()).padStart(2, '0');
-const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-const year = currentDate.getFullYear();
-const formattedDate = `${day}/${month}/${year}`;
-
-// Get current date and time
-const now = new Date();
-
-// Format date and time
-const formattedDateTime = `Generated on: ${now.toLocaleDateString()} at ${now.toLocaleTimeString()}`;
-
+      // Get current date and time
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+      
+      // Format date and time
+      const formattedDateTime = `Generated on: ${day}/${month}/${year} at ${now.toLocaleTimeString()}`;
 // Add to PDF
 doc.text(
   formattedDateTime,
