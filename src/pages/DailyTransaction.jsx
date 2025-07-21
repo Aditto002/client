@@ -75,6 +75,9 @@ const DailyTransaction = () => {
       // Only add date parameters if they're not empty
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
+//       if (startDate) params.startDate = new Date(startDate).toISOString().split('T')[0].replace(/-/g, '/');
+// if (endDate) params.endDate = new Date(endDate).toISOString().split('T')[0].replace(/-/g, '/');
+
 
       const response = await axios.get(
         "https://bebsa.ahadalichowdhury.online/api/credit/personal",
@@ -205,12 +208,24 @@ const DailyTransaction = () => {
         54
       );
 
-      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
-      doc.text(
-        generatedText,
-        (pageWidth - doc.getTextWidth(generatedText)) / 2,
-        60
-      );
+      // const generatedText = `Generated on: ${new Date().toLocaleString()}`;
+      // doc.text(
+      //   generatedText,
+      //   (pageWidth - doc.getTextWidth(generatedText)) / 2,
+      //   60
+      // );
+      const currentDate = new Date();
+const day = String(currentDate.getDate()).padStart(2, '0');
+const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+const year = currentDate.getFullYear();
+const formattedDate = `${day}/${month}/${year}`;
+const formattedTime = currentDate.toLocaleTimeString();
+const generatedText = `Generated on: ${formattedDate} at ${formattedTime}`;
+doc.text(
+  generatedText,
+  (pageWidth - doc.getTextWidth(generatedText)) / 2,
+  60
+);
 
       // Format transaction data for the table
       const tableData = transactions.map((transaction) => [
@@ -218,7 +233,7 @@ const DailyTransaction = () => {
         transaction.newAmount || "",
         transaction.customerNumber || "",
         transaction.selectedAccount || "",
-        transaction.selectedNumber || "",
+        transaction.totalBalance || "",// change selectedNumber
         transaction.remarks || "",
       ]);
 
@@ -263,10 +278,38 @@ const DailyTransaction = () => {
       ); // Right-aligned
 
       // Save the PDF
-      const fileName =
-        startDate && endDate
-          ? `transactions_${startDate}_to_${endDate}.pdf`
-          : `transactions_all_dates.pdf`;
+      // Get your dates from wherever you're currently getting them
+// Then format them:
+const formatDate = (date) => {
+  const d = new Date(date);
+  return d.getDate().toString().padStart(2, '0') + '/' + 
+         (d.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+         d.getFullYear();
+};
+
+// Format both dates
+const formattedStartDate = startDate ? formatDate(startDate) : '';
+const formattedEndDate = endDate ? formatDate(endDate) : '';
+
+// Create current date for the default filename
+const today = new Date();
+const formattedToday = today.getDate().toString().padStart(2, '0') + '/' + 
+                       (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                       today.getFullYear();
+
+// Use the formatted dates in the filename
+const fileName =
+  startDate && endDate
+    ? `DAILY_TRANSACTION_SHEET_${formattedStartDate}_to_${formattedEndDate}.pdf`
+    : `DAILY_TRANSACTION_SHEET_${formattedToday}.pdf`;
+      // const date = new Date();
+      // const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' + 
+      //                      (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+      //                      date.getFullYear();
+      // const fileName =
+      //   startDate && endDate
+      //     ? `DAILY_TRANSACTION_SHEET_${startDate}_to_${endDate}.pdf`
+      //     : `DAILY_TRANSACTION_SHEET_${formattedDateS}.pdf`;
       console.log("Saving PDF with filename:", fileName);
       doc.save(fileName);
 
@@ -387,7 +430,7 @@ const DailyTransaction = () => {
       />
       
       <div className="text-center mb-10 mt-10">
-        <h1 className="text-4xl font-bold">Daily Transaction</h1>
+        <h1 className="text-4xl font-bold">Daily Transaction Register</h1>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6">
@@ -429,6 +472,7 @@ const DailyTransaction = () => {
               onChange={(e) => setTempStartDate(e.target.value)}
               className="p-2 border rounded w-40 sm:w-52 md:w-60"
             />
+
           </div>
 
           <div className="flex flex-col">
