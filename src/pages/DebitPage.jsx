@@ -49,7 +49,7 @@ export default function DebitPage() {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         )
@@ -188,7 +188,7 @@ export default function DebitPage() {
     try {
       console.log('data', formData)
       const response = await axios.post(
-        'http://localhost:5000/api/debit',
+        'https://bebsa.ahadalichowdhury.online/api/debit',
         formData
       )
       console.log('Success:', response.data)
@@ -197,7 +197,7 @@ export default function DebitPage() {
       // After successful submission, refetch the updated balance
       try {
         const updatedCompanyResponse = await axios.get(
-          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         )
