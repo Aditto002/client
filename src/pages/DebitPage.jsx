@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css'
 export default function DebitPage() {
   const [companyData, setCompanyData] = useState([])
   const [selectedAmount, setSelectedAmount] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationError, setValidationError] = useState("")
   const [formData, setFormData] = useState({
     company: '',
     amount: 0,
@@ -40,27 +42,48 @@ export default function DebitPage() {
 
   useEffect(() => {
     const fetchCompanyDetails = async () => {
-      if (!formData.company) return // Exit if no company is selected
+      if (!formData.company) {
+        setCompanyData([])
+        return
+      }
 
       try {
         const response = await axios.get(
-          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         )
 
-        if (response.data.success) {
-          setCompanyData(response.data.data) // Store all company data
-          console.log('number', response.data.data)
-          setFormData((prev) => ({
-            ...prev,
-            selectedAccount: '',
-            //  setSelectedAmount: "", // Reset when company changes
-          }))
+        if (response.data && response.data.success) {
+          setCompanyData(response.data.data || [])
+          
+          // If there's a selected account, update its details
+          if (formData.selectedAccount) {
+            const selectedAccount = response.data.data.find(
+              (item) => item && item.mobileNumber === formData.selectedAccount
+            )
+
+            if (selectedAccount && selectedAccount.totalAmount !== undefined) {
+              setSelectedAmount(selectedAccount.totalAmount.toString())
+              setFormData((prev) => ({
+                ...prev,
+                currentAmount: selectedAccount.totalAmount,
+              }))
+            }
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              selectedAccount: '',
+            }))
+            setSelectedAmount('')
+          }
+        } else {
+          setCompanyData([])
         }
       } catch (error) {
         console.error('Error fetching company details:', error)
         toast.error('Failed to fetch company details')
+        setCompanyData([])
       }
     }
 
@@ -68,62 +91,149 @@ export default function DebitPage() {
   }, [formData.company])
 
   const handleNumberSelection = (selectedMobile) => {
+    if (!selectedMobile) {
+      setFormData((prev) => ({
+        ...prev,
+        selectedAccount: "",
+      }))
+      setSelectedAmount("")
+      return
+    }
+
     const selectedAccount = companyData.find(
-      (item) => item.mobileNumber === selectedMobile
+      (item) => item && item.mobileNumber === selectedMobile
     )
-    if (selectedAccount) {
+    
+    if (selectedAccount && selectedAccount.totalAmount !== undefined) {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
-        currentAmount: selectedAccount.totalAmount, // Add this line to save currentAmount
+        currentAmount: selectedAccount.totalAmount,
       }))
       setSelectedAmount(selectedAccount.totalAmount.toString())
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        selectedAccount: selectedMobile,
+        currentAmount: 0,
+      }))
+      setSelectedAmount("0")
     }
+  }
+
+  // Function to handle statement button click with validation
+  const handleStatementClick = (e) => {
+    e.preventDefault() // Prevent default button behavior
+
+    // Validate if company and account are selected
+    if (!formData.company) {
+      setValidationError(
+        "Please select a company before proceeding to statement"
+      )
+      toast.warning("Please select a company")
+      return
+    }
+
+    if (!formData.selectedAccount) {
+      setValidationError(
+        "Please select a number before proceeding to statement"
+      )
+      toast.warning("Please select a number")
+      return
+    }
+
+    // If validation passes, clear any errors
+    setValidationError("")
+
+    // Get current date in YYYY-MM-DD format for default date range
+    const today = new Date().toISOString().split("T")[0]
+
+    // Construct the statement page URL
+    const statementUrl = `/statement?selectCompany=${encodeURIComponent(
+      formData.company
+    )}&selectedNumber=${encodeURIComponent(
+      formData.selectedAccount
+    )}&startDate=${today}&endDate=${today}`
+
+    // Open the statement page in a new tab
+    window.open(statementUrl, "_blank")
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log(formData)
+
+    if (isSubmitting) return // Prevent double-click
+    setIsSubmitting(true)     // Lock submit
+
+    // Validate required fields before submission
+    if (!formData.company || !formData.selectedAccount) {
+      toast.error("Company and number selection is required")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (!formData.amount || formData.amount <= 0) {
+      toast.error("Please enter a valid debit amount")
+      setIsSubmitting(false)
+      return
+    }
+
+    // Check if debit amount exceeds balance
+    if (Number(formData.amount) > Number(selectedAmount)) {
+      toast.error("Debit amount cannot exceed available balance")
+      setIsSubmitting(false)
+      return
+    }
+
     try {
-      console.log(formData)
+      console.log('data', formData)
       const response = await axios.post(
-        'https://bebsa.ahadalichowdhury.online/api/debit',
+        'http://localhost:5000/api/debit',
         formData
       )
       console.log('Success:', response.data)
-
-      // Show success toast notification
       toast.success('Transaction submitted successfully!')
 
-      // Store the current company and selected account
-      const currentCompany = formData.company
-      const currentSelectedAccount = formData.selectedAccount
+      // After successful submission, refetch the updated balance
+      try {
+        const updatedCompanyResponse = await axios.get(
+          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+            formData.company
+          )}`
+        )
 
-      // Reset form but keep company and selected account
-      setFormData({
-        company: currentCompany,
-        selectedAccount: currentSelectedAccount,
-        amount: 0,
-        remarks: '',
-        currentAmount: Number(selectedAmount) - Number(formData.amount), // Update with new balance
-        statement: '',
-        entryBy: formData.entryBy,
-      })
+        if (updatedCompanyResponse.data && updatedCompanyResponse.data.success) {
+          const updatedAccount = updatedCompanyResponse.data.data.find(
+            (item) => item && item.mobileNumber === formData.selectedAccount
+          )
 
-      // Update the selected amount to reflect new balance
-      setSelectedAmount(
-        (Number(selectedAmount) - Number(formData.amount)).toString()
-      )
-
-      // No need to clear companyData since we want to keep the numbers dropdown
+          if (updatedAccount && updatedAccount.totalAmount !== undefined) {
+            setSelectedAmount(updatedAccount.totalAmount.toString())
+            setFormData((prev) => ({
+              ...prev,
+              amount: 0,
+              remarks: "",
+              currentAmount: updatedAccount.totalAmount,
+            }))
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching updated balance:", error)
+        // Still reset basic fields
+        setFormData((prev) => ({
+          ...prev,
+          amount: 0,
+          remarks: "",
+        }))
+      }
     } catch (error) {
       console.error(
         'Error submitting transaction:',
         error.response?.data || error.message
       )
-
-      // Show error toast notification
       toast.error('Failed to submit transaction. Please try again.')
+    } finally {
+      setIsSubmitting(false) // Re-enable submit
     }
   }
 
@@ -132,7 +242,7 @@ export default function DebitPage() {
       {/* Toast Container */}
       <ToastContainer
         position="top-center"
-        autoClose={5000}
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop
         closeOnClick
@@ -143,7 +253,13 @@ export default function DebitPage() {
       />
 
       <h1 className="text-3xl font-bold text-center mb-8">Debit</h1>
-      {/* <div className="text-emerald-500 font-bold text-xl mb-6">Debit</div> */}
+
+      {/* Show validation error message if exists */}
+      {validationError && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p>{validationError}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -180,11 +296,15 @@ export default function DebitPage() {
             required
           >
             <option value="">Select a number</option>
-            {companyData.map((item) => (
-              <option key={item._id} value={item.mobileNumber}>
-                {item.mobileNumber}
-              </option>
-            ))}
+            {companyData && companyData.length > 0
+              ? companyData.map((item) =>
+                  item && item._id && item.mobileNumber ? (
+                    <option key={item._id} value={item.mobileNumber}>
+                      {item.mobileNumber}
+                    </option>
+                  ) : null
+                )
+              : null}
           </select>
         </div>
 
@@ -197,8 +317,7 @@ export default function DebitPage() {
               <input
                 type="string"
                 className="w-full border rounded-md p-2"
-                // value={formData.selectedNumber}
-                value={selectedAmount}
+                value={selectedAmount || ""}
                 readOnly
               />
             </div>
@@ -237,18 +356,10 @@ export default function DebitPage() {
                     amount: value,
                   });
                 } else {
-                  // Optional: Display error or notification to user
-                  // alert("Negative values are not allowed");
                   toast.error('Negative values are not allowed')
                 }
               }}
               min="0"
-              // onChange={(e) =>
-              //   setFormData({
-              //     ...formData,
-              //     amount: e.target.value === '' ? '' : Number(e.target.value),
-              //   })
-              // }
             />
           </div>
         </div>
@@ -285,6 +396,14 @@ export default function DebitPage() {
             Back
           </Link>
 
+          {/* Add Statement button with validation */}
+          {/* <button
+            onClick={handleStatementClick}
+            className="bg-[color:oklch(0.852_0.199_91.936)] text-black px-6 py-2 rounded-md hover:bg-[color:oklch(0.421 0.095 57.708)]"
+          >
+            Statement
+          </button> */}
+
           {0 > Number(selectedAmount) - Number(formData.amount) ? (
             <button
               type="submit"
@@ -296,15 +415,14 @@ export default function DebitPage() {
           ) : (
             <button
               type="submit"
-              className="bg-emerald-500 text-white px-6 py-2 rounded-md"
+              className="bg-emerald-500 text-white px-6 py-2 rounded-md hover:bg-emerald-600"
+              disabled={isSubmitting}
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           )}
         </div>
       </form>
-
-      {/* <div className="text-center text-3xl text-red-500 font-bold mt-8">Demo Page-2</div> */}
     </div>
   )
 }

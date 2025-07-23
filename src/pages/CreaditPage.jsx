@@ -58,7 +58,7 @@ export default function CreditPage() {
 
       try {
         const response = await axios.get(
-          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         );
@@ -141,7 +141,7 @@ export default function CreditPage() {
     try {
       // First try to search by the input as provided (could be name or number)
       const response = await axios.get(
-        `https://bebsa.ahadalichowdhury.online/api/customers/search?customer=${encodeURIComponent(
+        `http://localhost:5000/api/customers/search?customer=${encodeURIComponent(
           searchInput
         )}`
       );
@@ -157,10 +157,10 @@ export default function CreditPage() {
         // Additional search for numbers only if the input contains only digits
         try {
           const numberResponse = await axios.get(
-            `https://bebsa.ahadalichowdhury.online/api/customers/search?mobileNumber=${encodeURIComponent(
+            `http://localhost:5000/api/customers/search?mobileNumber=${encodeURIComponent(
               searchInput
             )}`
-          );
+          );  
 
           if (
             numberResponse.data &&
@@ -299,7 +299,7 @@ const handleSubmit = async (e) => {
   try {
     console.log("data", formData);
     const response = await axios.post(
-      `https://bebsa.ahadalichowdhury.online/api/credit`,
+      `http://localhost:5000/api/credit`,
       formData
     );
     console.log("Success:", response.data);
@@ -308,7 +308,7 @@ const handleSubmit = async (e) => {
     // After successful submission, refetch the updated balance
     try {
       const updatedCompanyResponse = await axios.get(
-        `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+        `http://localhost:5000/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
           formData.company
         )}`
       );
