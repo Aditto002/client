@@ -315,8 +315,8 @@ const fileName = startDate && endDate
           <h1 className="text-4xl font-bold">Total Balance</h1>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6 md:mb-8">
-          <div className="flex flex-wrap justify-between items-center gap-5 md:gap-7">
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 md:mb-8">
+          <div className="flex flex-wrap justify-center items-center gap-5 md:gap-7">
             {/* Date Pickers */}
             {/* <div className="flex flex-col">
               <label className="block text-sm font-light mb-1">From</label>
