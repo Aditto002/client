@@ -134,7 +134,6 @@ const Balance = () => {
   
   // Function to submit update
   const handleUpdateSubmit = async () => {
-    setUpdateLoading(true)
     try {
       if (!updateData._id) {
         console.error("Update ID is missing", updateData);
@@ -149,8 +148,6 @@ const Balance = () => {
     } catch (error) {
       console.error("Error updating record:", error)
       alert("Error updating record: " + error.message)
-    } finally {
-      setUpdateLoading(false)
     }
   }
   
@@ -169,7 +166,6 @@ const Balance = () => {
   
   // Function to confirm and execute delete
   const confirmDelete = async () => {
-    setDeleteLoading(true)
     try {
       if (!deleteId) {
         console.error("Delete ID is missing");
@@ -184,15 +180,12 @@ const Balance = () => {
     } catch (error) {
       console.error("Error deleting record:", error)
       alert("Error deleting record: " + error.message)
-    } finally {
-      setDeleteLoading(false)
     }
   }
 // const formatDate = (date) => {
 //   return new Date(date).toLocaleDateString("en-GB"); // Format: dd/mm/yyyy
 // };
   const downloadTransactionsPDF = async () => {
-    setDownloadLoading(true)
     try {
       console.log("Download PDF function called");
       
@@ -313,8 +306,6 @@ const fileName = startDate && endDate
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Error generating PDF: " + error.message);
-    } finally {
-      setDownloadLoading(false)
     }
   };
 
@@ -324,46 +315,48 @@ const fileName = startDate && endDate
           <h1 className="text-4xl font-bold">Total Balance</h1>
         </div>
 
-        <div className="flex items-center gap-x-4 md:gap-x-6 mb-8 flex-wrap">
-          {/* From */}
-          <div className="flex flex-col">
-            <label className="block text-sm font-light mb-1">From</label>
-            <input
-              type="date"
-              value={tempStartDate}//tempStartDate
-              onChange={(e) => setTempStartDate(e.target.value)}///(e) => setTempStartDate(e.target.value)
-              className="p-2 border rounded w-40 sm:w-52 md:w-60"
-            />
-          </div>
-          {/* To */}
-          <div className="flex flex-col">
-            <label className="block text-sm font-light mb-1">To</label>
-            <input
-              type="date"
-              value={tempEndDate}
-              onChange={(e) => setTempEndDate(e.target.value)}
-              className="p-2 border rounded w-40 sm:w-52 md:w-60"
-            />
-          </div>
-          {/* Apply Button */}
-          <button
-            onClick={handleApplyFilters}
-            className="bg-green-500 text-white py-2 px-5 rounded-lg mt-6"
-            style={{ height: "42px" }}
-          >
-            Apply
-          </button>
-          {/* Download PDF Button */}
-          <button
-            onClick={downloadTransactionsPDF}
-            className="bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center gap-2 mt-6"
-            style={{ height: "42px" }}
-          >
-            <FiDownload size={14} /> Download PDF
-          </button>
-          {/* Total Amount */}
-          <div className="text-lg font-semibold mt-6" style={{ height: "42px", display: "flex", alignItems: "center" }}>
-            <p>Total Amount: {totalAmount?.totalSum}</p>
+        <div className="flex flex-wrap items-center justify-between gap-4 md:gap-6 md:mb-8">
+          <div className="flex flex-wrap justify-between items-center gap-5 md:gap-7">
+            {/* Date Pickers */}
+            {/* <div className="flex flex-col">
+              <label className="block text-sm font-light mb-1">From</label>
+              <input
+                type="date"
+                value={tempStartDate}//tempStartDate
+                onChange={(e) => setTempStartDate(e.target.value)}///(e) => setTempStartDate(e.target.value)
+                className="p-2 border rounded w-40 sm:w-52 md:w-60"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="block text-sm font-light mb-1">To</label>
+              <input
+                type="date"
+                value={tempEndDate}
+                onChange={(e) => setTempEndDate(e.target.value)}
+                className="p-2 border rounded w-40 sm:w-52 md:w-60"
+              />
+            </div> */}
+
+            {/* Buttons */}
+            <div className="flex justify-center items-center gap-10">
+  {/* <button onClick={handleApplyFilters} className="bg-green-500 text-white py-2 px-5 rounded-lg">
+    Apply
+  </button> */}
+
+  <button 
+    onClick={downloadTransactionsPDF} 
+    className="bg-blue-500 text-white py-2 px-4 rounded-lg flex items-center gap-2"
+  >
+    <FiDownload size={14} /> Download PDF
+  </button>
+
+  <div className="text-lg font-semibold">
+    <p>Total Amount: {totalAmount?.totalSum}</p>
+  </div>
+             </div>
+
+            {/* Total Amount - Moved to the right */}
           </div>
         </div>
 
@@ -563,16 +556,14 @@ const fileName = startDate && endDate
                 <button
                   onClick={() => setShowUpdateModal(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
-                  disabled={updateLoading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateSubmit}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-60"
-                  disabled={updateLoading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >
-                  {updateLoading ? "Updating..." : "Update"}
+                  Update
                 </button>
               </div>
             </div>
@@ -591,16 +582,14 @@ const fileName = startDate && endDate
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
-                  disabled={deleteLoading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-60"
-                  disabled={deleteLoading}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                 >
-                  {deleteLoading ? "Deleting..." : "Delete"}
+                  Delete
                 </button>
               </div>
             </div>
