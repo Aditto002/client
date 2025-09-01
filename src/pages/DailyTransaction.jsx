@@ -80,7 +80,7 @@ const DailyTransaction = () => {
 
 
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/credit/personal",
+        "https://bebsa-backend.onrender.com/api/credit/personal",
         {
           params: params,
         }
@@ -124,7 +124,7 @@ const DailyTransaction = () => {
       if (endDate) params.endDate = endDate;
 
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/credit/download-pdf",
+        "https://bebsa-backend.onrender.com/api/credit/download-pdf",
         {
           params: params,
         }
@@ -360,7 +360,7 @@ const fileName =
 
       // Use the _id in the API endpoint
       await axios.put(
-        `https://bebsa.ahadalichowdhury.online/api/credit/${updateData._id}`,
+        `https://bebsa-backend.onrender.com/api/credit/${updateData._id}`,
         updateData
       );
       setIsUpdateModalOpen(false);
@@ -396,7 +396,7 @@ const fileName =
       }
 
       await axios.delete(
-        `https://bebsa.ahadalichowdhury.online/api/credit/${deleteId}`
+        `https://bebsa-backend.onrender.com/api/credit/${deleteId}`
       );
       setIsDeleteConfirmOpen(false);
       fetchTransactions(); // Refresh data after delete

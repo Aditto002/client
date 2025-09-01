@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/user/verify", { name: username });
+      const response = await axios.post("https://bebsa-backend.onrender.com/api/user/verify", { name: username });
 
       if (response.data.success) {
         setSuccess("User verified. Please set a new password.");
@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/user/reset-password", {
+      const response = await axios.post("https://bebsa-backend.onrender.com/api/user/reset-password", {
         name: username,
         newPassword,
       });

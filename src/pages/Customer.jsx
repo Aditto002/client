@@ -120,7 +120,7 @@ const Customer = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
+      const response = await axios.get("https://bebsa-backend.onrender.com/api/mobileAccounts", {
         params: params,
       })
       setTransactions(response.data.data.accounts)
@@ -143,7 +143,7 @@ const Customer = () => {
       // Only add search parameter if it has a value
       if (searchQuery) params.search = searchQuery
 
-      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/customers", {
+      const response = await axios.get("https://bebsa-backend.onrender.com/api/customers", {
         params: params,
       })
 
@@ -188,7 +188,7 @@ const Customer = () => {
       setIsSubmitting(true)
       setError("")
       
-      const response = await axios.post("https://bebsa.ahadalichowdhury.online/api/customers", {
+      const response = await axios.post("https://bebsa-backend.onrender.com/api/customers", {
         customerName,
         mobileNumber
       })
@@ -241,7 +241,7 @@ const Customer = () => {
       setIsUpdating(true)
       setUpdateError("")
       
-      const response = await axios.put(`https://bebsa.ahadalichowdhury.online/api/customers/${updateCustomerId}`, {
+      const response = await axios.put(`https://bebsa-backend.onrender.com/api/customers/${updateCustomerId}`, {
         customerName: updateCustomerName,
         mobileNumber: updateMobileNumber
       })
@@ -281,7 +281,7 @@ const Customer = () => {
     try {
       setIsDeleting(true)
       
-      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/customers/${deleteCustomerId}`)
+      await axios.delete(`https://bebsa-backend.onrender.com/api/customers/${deleteCustomerId}`)
       
       console.log("Customer deleted successfully")
       

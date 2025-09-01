@@ -88,7 +88,7 @@ const StatementPage = () => {
 
       // Use the new API endpoint for account data
       const response = await axios.get(
-        'https://bebsa.ahadalichowdhury.online/api/credit/account-datas',
+        'https://bebsa-backend.onrender.com/api/credit/account-datas',
         {
           params: params,
         }
@@ -144,7 +144,7 @@ const StatementPage = () => {
 
       // Use the same endpoint but with a high limit
       const response = await axios.get(
-        'https://bebsa.ahadalichowdhury.online/api/credit/account-datas',
+        'https://bebsa-backend.onrender.com/api/credit/account-datas',
         {
           params: params,
         }
@@ -226,7 +226,7 @@ const StatementPage = () => {
       }
 
       await axios.put(
-        `https://bebsa.ahadalichowdhury.online/api/credit/${updateData._id}`,
+        `https://bebsa-backend.onrender.com/api/credit/${updateData._id}`,
         updateData
       )
       setShowUpdateModal(false)
@@ -267,7 +267,7 @@ const StatementPage = () => {
       }
       console.log("data", deleteId)
       await axios.post(
-        `https://bebsa.ahadalichowdhury.online/api/credit/statement-delete`,deleteId
+        `https://bebsa-backend.onrender.com/api/credit/statement-delete`,deleteId
       )
       setShowDeleteConfirm(false)
       fetchTransactions() // Refresh the data

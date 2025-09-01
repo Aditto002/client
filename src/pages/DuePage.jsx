@@ -107,7 +107,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
       };
 
       const response = await axios.post(
-        "https://bebsa.ahadalichowdhury.online/api/transactions",
+        "https://bebsa-backend.onrender.com/api/transactions",
         payload
       );
       console.log("create Data", response.data)
@@ -312,7 +312,7 @@ const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
       };
 
       const response = await axios.put(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/users/${customer._id}`,
+        `https://bebsa-backend.onrender.com/api/transactions/users/${customer._id}`,
         payload
       );
       
@@ -421,7 +421,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, customer, onSuccess }) => {
       setError("");
 
       const response = await axios.delete(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/users/${customer._id}`
+        `https://bebsa-backend.onrender.com/api/transactions/users/${customer._id}`
       );
 
       if (response.data) {
@@ -559,7 +559,7 @@ const DuePage = () => {
       }
 
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/get-transactions",
+        "https://bebsa-backend.onrender.com/api/get-transactions",
         { params }
       );
 
@@ -728,7 +728,7 @@ const DuePage = () => {
 
       // Use the same endpoint that works for regular fetch
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/get-transactions"
+        "https://bebsa-backend.onrender.com/api/get-transactions"
       );
 
       console.log("PDF data response:", response.data);

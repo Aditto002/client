@@ -43,7 +43,7 @@ const [takedicchi,setTakedicchi] = useState(false);
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/${mobileNumber}`
+        `https://bebsa-backend.onrender.com/api/transactions/${mobileNumber}`
       );
       console.log("data",response.data)
       setCustomerData(response.data);
@@ -77,7 +77,7 @@ const [takedicchi,setTakedicchi] = useState(false);
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/${mobileNumber}`,
+        `https://bebsa-backend.onrender.com/api/transactions/${mobileNumber}`,
         {
           params: {
           
@@ -141,7 +141,7 @@ const handleEditSubmit = async (e) => {
 
   try {
     await axios.put(
-      `https://bebsa.ahadalichowdhury.online/api/transactions/${currentTransactionId}`,
+      `https://bebsa-backend.onrender.com/api/transactions/${currentTransactionId}`,
       {
         amount: Number(amount),
         notes: notes,
@@ -170,7 +170,7 @@ const handleDeleteSubmit = async () => {
 
   try {
     await axios.delete(
-      `https://bebsa.ahadalichowdhury.online/api/transactions/${currentTransactionId}`
+      `https://bebsa-backend.onrender.com/api/transactions/${currentTransactionId}`
     );
     setTransactionSuccess("Transaction deleted successfully!");
     setShowDeleteModal(false);
@@ -191,7 +191,7 @@ const handleDeleteSubmit = async () => {
 
     try {
       await axios.post(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/give/${mobileNumber}`,
+        `https://bebsa-backend.onrender.com/api/transactions/give/${mobileNumber}`,
         {
           amount: Number(amount),
           notes: notes,
@@ -219,7 +219,7 @@ const handleDeleteSubmit = async () => {
 
     try {
       await axios.post(
-        `https://bebsa.ahadalichowdhury.online/api/transactions/take/${mobileNumber}`,
+        `https://bebsa-backend.onrender.com/api/transactions/take/${mobileNumber}`,
         {
           amount: Number(amount),
           notes: notes,

@@ -8,7 +8,6 @@ export default function DebitPage() {
   const [companyData, setCompanyData] = useState([])
   const [selectedAmount, setSelectedAmount] = useState()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [validationError, setValidationError] = useState("")
   const [formData, setFormData] = useState({
     company: '',
     amount: 0,
@@ -49,7 +48,7 @@ export default function DebitPage() {
 
       try {
         const response = await axios.get(
-          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         )
@@ -121,44 +120,6 @@ export default function DebitPage() {
     }
   }
 
-  // Function to handle statement button click with validation
-  const handleStatementClick = (e) => {
-    e.preventDefault() // Prevent default button behavior
-
-    // Validate if company and account are selected
-    if (!formData.company) {
-      setValidationError(
-        "Please select a company before proceeding to statement"
-      )
-      toast.warning("Please select a company")
-      return
-    }
-
-    if (!formData.selectedAccount) {
-      setValidationError(
-        "Please select a number before proceeding to statement"
-      )
-      toast.warning("Please select a number")
-      return
-    }
-
-    // If validation passes, clear any errors
-    setValidationError("")
-
-    // Get current date in YYYY-MM-DD format for default date range
-    const today = new Date().toISOString().split("T")[0]
-
-    // Construct the statement page URL
-    const statementUrl = `/statement?selectCompany=${encodeURIComponent(
-      formData.company
-    )}&selectedNumber=${encodeURIComponent(
-      formData.selectedAccount
-    )}&startDate=${today}&endDate=${today}`
-
-    // Open the statement page in a new tab
-    window.open(statementUrl, "_blank")
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -188,7 +149,7 @@ export default function DebitPage() {
     try {
       console.log('data', formData)
       const response = await axios.post(
-        'https://bebsa.ahadalichowdhury.online/api/debit',
+        'https://bebsa-backend.onrender.com/api/debit',
         formData
       )
       console.log('Success:', response.data)
@@ -197,7 +158,7 @@ export default function DebitPage() {
       // After successful submission, refetch the updated balance
       try {
         const updatedCompanyResponse = await axios.get(
-          `https://bebsa.ahadalichowdhury.online/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         )
@@ -253,13 +214,6 @@ export default function DebitPage() {
       />
 
       <h1 className="text-3xl font-bold text-center mb-8">Debit</h1>
-
-      {/* Show validation error message if exists */}
-      {validationError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <p>{validationError}</p>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>

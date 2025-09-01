@@ -23,7 +23,7 @@ const DailyLog = () => {
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/mobileAccounts/today-log",
+        "https://bebsa-backend.onrender.com/api/mobileAccounts/today-log",
         {
           params: {
             page: currentPage,

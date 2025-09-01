@@ -61,7 +61,7 @@ const Balance = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts", {
+      const response = await axios.get("https://bebsa-backend.onrender.com/api/mobileAccounts", {
         params: params,
       })
       setTransactions(response.data.data.accounts)
@@ -82,7 +82,7 @@ const Balance = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
 
-      const response = await axios.get("https://bebsa.ahadalichowdhury.online/api/mobileAccounts/download-pdf", {
+      const response = await axios.get("https://bebsa-backend.onrender.com/api/mobileAccounts/download-pdf", {
         params: params,
       })
       setPDFData(response.data.data.accounts)
@@ -141,7 +141,7 @@ const Balance = () => {
         return;
       }
       
-      await axios.put(`https://bebsa.ahadalichowdhury.online/api/debit/${updateData._id}`, updateData)
+      await axios.put(`https://bebsa-backend.onrender.com/api/debit/${updateData._id}`, updateData)
       setShowUpdateModal(false)
       fetchTransactions() // Refresh the data
       alert("Record updated successfully")
@@ -173,7 +173,7 @@ const Balance = () => {
         return;
       }
       
-      await axios.delete(`https://bebsa.ahadalichowdhury.online/api/debit/${deleteId}`)
+      await axios.delete(`https://bebsa-backend.onrender.com/api/debit/${deleteId}`)
       setShowDeleteConfirm(false)
       fetchTransactions() // Refresh the data
       alert("Record deleted successfully")

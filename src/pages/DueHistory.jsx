@@ -22,7 +22,7 @@ const DueHistory = () => {
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(
-        "https://bebsa.ahadalichowdhury.online/api/due-history",
+        "https://bebsa-backend.onrender.com/api/due-history",
         {
           params: {
             page: currentPage,
