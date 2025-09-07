@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,6 +24,8 @@ export default function CreditPage() {
   const [searchTerm, setSearchTerm] = useState("");
   // Add validation error state
   const [validationError, setValidationError] = useState("");
+  // Add ref for dropdown container
+  const dropdownRef = useRef(null);
 
   // Get user from localStorage and set entryBy when component mounts
   useEffect(() => {
@@ -203,26 +205,19 @@ export default function CreditPage() {
     fetchCustomerSuggestions(value);
   };
 
-  // Client-side filtering for number search if the API doesn't handle it
+  // Handle click outside to close dropdown
   useEffect(() => {
-    if (
-      searchTerm &&
-      /^\d+$/.test(searchTerm) &&
-      customerSuggestions.length > 0
-    ) {
-      // If the search term is numeric, filter results client-side as well
-      const filteredResults = customerSuggestions.filter(
-        (customer) =>
-          customer &&
-          customer.mobileNumber &&
-          customer.mobileNumber.includes(searchTerm)
-      );
-
-      if (filteredResults.length > 0) {
-        setCustomerSuggestions(filteredResults);
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowSuggestions(false);
       }
-    }
-  }, [searchTerm, customerSuggestions.length]);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle selection from dropdown
   const handleSelectCustomer = (customer) => {
@@ -388,7 +383,7 @@ export default function CreditPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <label className="block text-sm font-medium mb-1">
               Search Customer (Name or Number)
             </label>
