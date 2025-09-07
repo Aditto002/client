@@ -1,202 +1,205 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function DebitPage() {
-  const [companyData, setCompanyData] = useState([])
-  const [selectedAmount, setSelectedAmount] = useState()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [companyData, setCompanyData] = useState([]);
+  const [selectedAmount, setSelectedAmount] = useState();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    company: '',
+    company: "",
     amount: 0,
-    remarks: '',
+    remarks: "",
     currentAmount: 0,
-    statement: '',
-    entryBy: '',
-  })
+    statement: "",
+    entryBy: "",
+  });
 
   useEffect(() => {
-    const userString = localStorage.getItem('user')
+    const userString = localStorage.getItem("user");
     if (userString) {
       try {
-        const userData = JSON.parse(userString)
+        const userData = JSON.parse(userString);
         if (userData && userData.name) {
           // Check if name is "Rajib" or "Rony" and set accordingly
-          if (userData.name === 'Rajib') {
-            setFormData((prev) => ({ ...prev, entryBy: 'Rajib' }))
-          } else if (userData.name === 'Rony') {
-            setFormData((prev) => ({ ...prev, entryBy: 'Rony' }))
+          if (userData.name === "Rajib") {
+            setFormData((prev) => ({ ...prev, entryBy: "Rajib" }));
+          } else if (userData.name === "Rony") {
+            setFormData((prev) => ({ ...prev, entryBy: "Rony" }));
           } else {
             // For any other name, default behavior
-            setFormData((prev) => ({ ...prev, entryBy: userData.name }))
+            setFormData((prev) => ({ ...prev, entryBy: userData.name }));
           }
         }
       } catch (e) {
-        console.error('Error parsing user from localStorage:', e)
+        console.error("Error parsing user from localStorage:", e);
       }
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const fetchCompanyDetails = async () => {
       if (!formData.company) {
-        setCompanyData([])
-        return
+        setCompanyData([]);
+        return;
       }
 
       try {
         const response = await axios.get(
-          `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa-backend.vercel.app/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
-        )
+        );
 
         if (response.data && response.data.success) {
-          setCompanyData(response.data.data || [])
-          
+          setCompanyData(response.data.data || []);
+
           // If there's a selected account, update its details
           if (formData.selectedAccount) {
             const selectedAccount = response.data.data.find(
               (item) => item && item.mobileNumber === formData.selectedAccount
-            )
+            );
 
             if (selectedAccount && selectedAccount.totalAmount !== undefined) {
-              setSelectedAmount(selectedAccount.totalAmount.toString())
+              setSelectedAmount(selectedAccount.totalAmount.toString());
               setFormData((prev) => ({
                 ...prev,
                 currentAmount: selectedAccount.totalAmount,
-              }))
+              }));
             }
           } else {
             setFormData((prev) => ({
               ...prev,
-              selectedAccount: '',
-            }))
-            setSelectedAmount('')
+              selectedAccount: "",
+            }));
+            setSelectedAmount("");
           }
         } else {
-          setCompanyData([])
+          setCompanyData([]);
         }
       } catch (error) {
-        console.error('Error fetching company details:', error)
-        toast.error('Failed to fetch company details')
-        setCompanyData([])
+        console.error("Error fetching company details:", error);
+        toast.error("Failed to fetch company details");
+        setCompanyData([]);
       }
-    }
+    };
 
-    fetchCompanyDetails()
-  }, [formData.company])
+    fetchCompanyDetails();
+  }, [formData.company]);
 
   const handleNumberSelection = (selectedMobile) => {
     if (!selectedMobile) {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: "",
-      }))
-      setSelectedAmount("")
-      return
+      }));
+      setSelectedAmount("");
+      return;
     }
 
     const selectedAccount = companyData.find(
       (item) => item && item.mobileNumber === selectedMobile
-    )
-    
+    );
+
     if (selectedAccount && selectedAccount.totalAmount !== undefined) {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
         currentAmount: selectedAccount.totalAmount,
-      }))
-      setSelectedAmount(selectedAccount.totalAmount.toString())
+      }));
+      setSelectedAmount(selectedAccount.totalAmount.toString());
     } else {
       setFormData((prev) => ({
         ...prev,
         selectedAccount: selectedMobile,
         currentAmount: 0,
-      }))
-      setSelectedAmount("0")
+      }));
+      setSelectedAmount("0");
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (isSubmitting) return // Prevent double-click
-    setIsSubmitting(true)     // Lock submit
+    if (isSubmitting) return; // Prevent double-click
+    setIsSubmitting(true); // Lock submit
 
     // Validate required fields before submission
     if (!formData.company || !formData.selectedAccount) {
-      toast.error("Company and number selection is required")
-      setIsSubmitting(false)
-      return
+      toast.error("Company and number selection is required");
+      setIsSubmitting(false);
+      return;
     }
 
     if (!formData.amount || formData.amount <= 0) {
-      toast.error("Please enter a valid debit amount")
-      setIsSubmitting(false)
-      return
+      toast.error("Please enter a valid debit amount");
+      setIsSubmitting(false);
+      return;
     }
 
     // Check if debit amount exceeds balance
     if (Number(formData.amount) > Number(selectedAmount)) {
-      toast.error("Debit amount cannot exceed available balance")
-      setIsSubmitting(false)
-      return
+      toast.error("Debit amount cannot exceed available balance");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-      console.log('data', formData)
+      console.log("data", formData);
       const response = await axios.post(
-        'https://bebsa-backend.onrender.com/api/debit',
+        "https://bebsa-backend.vercel.app/api/debit",
         formData
-      )
-      console.log('Success:', response.data)
-      toast.success('Transaction submitted successfully!')
+      );
+      console.log("Success:", response.data);
+      toast.success("Transaction submitted successfully!");
 
       // After successful submission, refetch the updated balance
       try {
         const updatedCompanyResponse = await axios.get(
-          `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa-backend.vercel.app/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
-        )
+        );
 
-        if (updatedCompanyResponse.data && updatedCompanyResponse.data.success) {
+        if (
+          updatedCompanyResponse.data &&
+          updatedCompanyResponse.data.success
+        ) {
           const updatedAccount = updatedCompanyResponse.data.data.find(
             (item) => item && item.mobileNumber === formData.selectedAccount
-          )
+          );
 
           if (updatedAccount && updatedAccount.totalAmount !== undefined) {
-            setSelectedAmount(updatedAccount.totalAmount.toString())
+            setSelectedAmount(updatedAccount.totalAmount.toString());
             setFormData((prev) => ({
               ...prev,
               amount: 0,
               remarks: "",
               currentAmount: updatedAccount.totalAmount,
-            }))
+            }));
           }
         }
       } catch (error) {
-        console.error("Error fetching updated balance:", error)
+        console.error("Error fetching updated balance:", error);
         // Still reset basic fields
         setFormData((prev) => ({
           ...prev,
           amount: 0,
           remarks: "",
-        }))
+        }));
       }
     } catch (error) {
       console.error(
-        'Error submitting transaction:',
+        "Error submitting transaction:",
         error.response?.data || error.message
-      )
-      toast.error('Failed to submit transaction. Please try again.')
+      );
+      toast.error("Failed to submit transaction. Please try again.");
     } finally {
-      setIsSubmitting(false) // Re-enable submit
+      setIsSubmitting(false); // Re-enable submit
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -279,9 +282,9 @@ export default function DebitPage() {
               Total :
               {isNaN(Number(selectedAmount)) ||
               isNaN(Number(formData.amount)) ||
-              selectedAmount === '' ||
-              formData.amount === '' ? (
-                ''
+              selectedAmount === "" ||
+              formData.amount === "" ? (
+                ""
               ) : Number(selectedAmount) - Number(formData.amount) < 0 ? (
                 <span className="text-red-600">
                   {Number(selectedAmount) - Number(formData.amount)}
@@ -301,16 +304,17 @@ export default function DebitPage() {
             <input
               type="number"
               className="w-full border rounded-md p-2"
-              value={formData.amount === 0 ? '' : formData.amount}
+              value={formData.amount === 0 ? "" : formData.amount}
               onChange={(e) => {
-                const value = e.target.value === '' ? 0 : Number(e.target.value);
+                const value =
+                  e.target.value === "" ? 0 : Number(e.target.value);
                 if (value >= 0) {
                   setFormData({
                     ...formData,
                     amount: value,
                   });
                 } else {
-                  toast.error('Negative values are not allowed')
+                  toast.error("Negative values are not allowed");
                 }
               }}
               min="0"
@@ -378,5 +382,5 @@ export default function DebitPage() {
         </div>
       </form>
     </div>
-  )
+  );
 }

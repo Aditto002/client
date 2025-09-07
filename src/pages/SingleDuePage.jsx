@@ -25,8 +25,8 @@ export default function SingleDuePage() {
   const [dicchi, setDicchi] = useState(true);
   const summaryTextRef = useRef(null);
   const [startDate, setStartDate] = useState("");
-const [endDate, setEndDate] = useState("");
-const [takedicchi,setTakedicchi] = useState(false);
+  const [endDate, setEndDate] = useState("");
+  const [takedicchi, setTakedicchi] = useState(false);
 
   // Extract mobile number from URL query parameter
   const location = useLocation();
@@ -43,9 +43,9 @@ const [takedicchi,setTakedicchi] = useState(false);
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://bebsa-backend.onrender.com/api/transactions/${mobileNumber}`
+        `https://bebsa-backend.vercel.app/api/transactions/${mobileNumber}`
       );
-      console.log("data",response.data)
+      console.log("data", response.data);
       setCustomerData(response.data);
       setLoading(false);
     } catch (err) {
@@ -73,17 +73,16 @@ const [takedicchi,setTakedicchi] = useState(false);
       setTransactionError("Please select both start and end dates");
       return;
     }
-  
+
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://bebsa-backend.onrender.com/api/transactions/${mobileNumber}`,
+        `https://bebsa-backend.vercel.app/api/transactions/${mobileNumber}`,
         {
           params: {
-          
             from: startDate,
-            to: endDate
-          }
+            to: endDate,
+          },
         }
       );
       setCustomerData(response.data);
@@ -114,75 +113,75 @@ const [takedicchi,setTakedicchi] = useState(false);
   // };
 
   // New function to handle opening the edit modal
-// Function to handle opening the edit modal
-const openEditModal = (transaction,given) => {
-  if(given>0){
-    setTakedicchi(true)
-  }
-  setCurrentTransactionId(transaction._id);
-  setAmount(transaction.taken > 0 ? transaction.taken : transaction.given);
-  setNotes(transaction.notes || "");
-  setDicchi(transaction.given > 0); // If given > 0, it's a "dicchi" transaction
-  setShowEditModal(true);
-};
+  // Function to handle opening the edit modal
+  const openEditModal = (transaction, given) => {
+    if (given > 0) {
+      setTakedicchi(true);
+    }
+    setCurrentTransactionId(transaction._id);
+    setAmount(transaction.taken > 0 ? transaction.taken : transaction.given);
+    setNotes(transaction.notes || "");
+    setDicchi(transaction.given > 0); // If given > 0, it's a "dicchi" transaction
+    setShowEditModal(true);
+  };
 
-// Function to handle opening the delete modal
-const openDeleteModal = (transaction) => {
-  setCurrentTransactionId(transaction._id);
-  setShowDeleteModal(true);
-};
+  // Function to handle opening the delete modal
+  const openDeleteModal = (transaction) => {
+    setCurrentTransactionId(transaction._id);
+    setShowDeleteModal(true);
+  };
   // New function to handle the edit submission
-// Function to handle the edit submission
-const handleEditSubmit = async (e) => {
-  e.preventDefault();
-  setTransactionLoading(true);
-  setTransactionError(null);
-  setTransactionSuccess(null);
+  // Function to handle the edit submission
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setTransactionLoading(true);
+    setTransactionError(null);
+    setTransactionSuccess(null);
 
-  try {
-    await axios.put(
-      `https://bebsa-backend.onrender.com/api/transactions/${currentTransactionId}`,
-      {
-        amount: Number(amount),
-        notes: notes,
-        dicchi: dicchi
-      }
-    );
-    setTransactionSuccess("Transaction updated successfully!");
-    setAmount("");
-    setNotes("");
-    setShowEditModal(false);
-    // Refresh data after transaction
-    fetchCustomerData();
-  } catch (err) {
-    setTransactionError("Failed to update transaction. Please try again.");
-    console.error("Error updating transaction:", err);
-  } finally {
-    setTransactionLoading(false);
-  }
-};
+    try {
+      await axios.put(
+        `https://bebsa-backend.vercel.app/api/transactions/${currentTransactionId}`,
+        {
+          amount: Number(amount),
+          notes: notes,
+          dicchi: dicchi,
+        }
+      );
+      setTransactionSuccess("Transaction updated successfully!");
+      setAmount("");
+      setNotes("");
+      setShowEditModal(false);
+      // Refresh data after transaction
+      fetchCustomerData();
+    } catch (err) {
+      setTransactionError("Failed to update transaction. Please try again.");
+      console.error("Error updating transaction:", err);
+    } finally {
+      setTransactionLoading(false);
+    }
+  };
 
-// Function to handle the delete submission
-const handleDeleteSubmit = async () => {
-  setTransactionLoading(true);
-  setTransactionError(null);
-  setTransactionSuccess(null);
+  // Function to handle the delete submission
+  const handleDeleteSubmit = async () => {
+    setTransactionLoading(true);
+    setTransactionError(null);
+    setTransactionSuccess(null);
 
-  try {
-    await axios.delete(
-      `https://bebsa-backend.onrender.com/api/transactions/${currentTransactionId}`
-    );
-    setTransactionSuccess("Transaction deleted successfully!");
-    setShowDeleteModal(false);
-    // Refresh data after transaction
-    fetchCustomerData();
-  } catch (err) {
-    setTransactionError("Failed to delete transaction. Please try again.");
-    console.error("Error deleting transaction:", err);
-  } finally {
-    setTransactionLoading(false);
-  }
-};
+    try {
+      await axios.delete(
+        `https://bebsa-backend.vercel.app/api/transactions/${currentTransactionId}`
+      );
+      setTransactionSuccess("Transaction deleted successfully!");
+      setShowDeleteModal(false);
+      // Refresh data after transaction
+      fetchCustomerData();
+    } catch (err) {
+      setTransactionError("Failed to delete transaction. Please try again.");
+      console.error("Error deleting transaction:", err);
+    } finally {
+      setTransactionLoading(false);
+    }
+  };
   const handleGiveSubmit = async (e) => {
     e.preventDefault();
     setTransactionLoading(true);
@@ -191,7 +190,7 @@ const handleDeleteSubmit = async () => {
 
     try {
       await axios.post(
-        `https://bebsa-backend.onrender.com/api/transactions/give/${mobileNumber}`,
+        `https://bebsa-backend.vercel.app/api/transactions/give/${mobileNumber}`,
         {
           amount: Number(amount),
           notes: notes,
@@ -219,7 +218,7 @@ const handleDeleteSubmit = async () => {
 
     try {
       await axios.post(
-        `https://bebsa-backend.onrender.com/api/transactions/take/${mobileNumber}`,
+        `https://bebsa-backend.vercel.app/api/transactions/take/${mobileNumber}`,
         {
           amount: Number(amount),
           notes: notes,
@@ -328,47 +327,50 @@ const handleDeleteSubmit = async () => {
       // );
       // Get current date and time
       const now = new Date();
-      const day = String(now.getDate()).padStart(2, '0');
-      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth() + 1).padStart(2, "0");
       const year = now.getFullYear();
-      
+
       // Format date and time
       const formattedDateTime = `Generated on: ${day}/${month}/${year} at ${now.toLocaleTimeString()}`;
-// Add to PDF
-doc.text(
-  formattedDateTime,
-  pageWidth - 15 - doc.getTextWidth(formattedDateTime),
-  48
-);
+      // Add to PDF
+      doc.text(
+        formattedDateTime,
+        pageWidth - 15 - doc.getTextWidth(formattedDateTime),
+        48
+      );
 
-if (startDate || endDate) {
-  // Format startDate and endDate in dd/mm/yyyy
-  // Assuming startDate and endDate are Date objects or date strings
-  let formattedStartDate = '';
-  let formattedEndDate = '';
-  
-  if (startDate) {
-    const startDateObj = new Date(startDate);
-    const startDay = String(startDateObj.getDate()).padStart(2, '0');
-    const startMonth = String(startDateObj.getMonth() + 1).padStart(2, '0');
-    const startYear = startDateObj.getFullYear();
-    formattedStartDate = `${startDay}/${startMonth}/${startYear}`;
-  }
-  
-  if (endDate) {
-    const endDateObj = new Date(endDate);
-    const endDay = String(endDateObj.getDate()).padStart(2, '0');
-    const endMonth = String(endDateObj.getMonth() + 1).padStart(2, '0');
-    const endYear = endDateObj.getFullYear();
-    formattedEndDate = `${endDay}/${endMonth}/${endYear}`;
-  }
-  
-  const dateRangeText = `Date : ${formattedStartDate} To ${formattedEndDate}`;
-  doc.text(
-    dateRangeText,
-    pageWidth - 15 - doc.getTextWidth(dateRangeText),
-    58
-  );
+      if (startDate || endDate) {
+        // Format startDate and endDate in dd/mm/yyyy
+        // Assuming startDate and endDate are Date objects or date strings
+        let formattedStartDate = "";
+        let formattedEndDate = "";
+
+        if (startDate) {
+          const startDateObj = new Date(startDate);
+          const startDay = String(startDateObj.getDate()).padStart(2, "0");
+          const startMonth = String(startDateObj.getMonth() + 1).padStart(
+            2,
+            "0"
+          );
+          const startYear = startDateObj.getFullYear();
+          formattedStartDate = `${startDay}/${startMonth}/${startYear}`;
+        }
+
+        if (endDate) {
+          const endDateObj = new Date(endDate);
+          const endDay = String(endDateObj.getDate()).padStart(2, "0");
+          const endMonth = String(endDateObj.getMonth() + 1).padStart(2, "0");
+          const endYear = endDateObj.getFullYear();
+          formattedEndDate = `${endDay}/${endMonth}/${endYear}`;
+        }
+
+        const dateRangeText = `Date : ${formattedStartDate} To ${formattedEndDate}`;
+        doc.text(
+          dateRangeText,
+          pageWidth - 15 - doc.getTextWidth(dateRangeText),
+          58
+        );
       }
 
       // Format transaction data for the table
@@ -575,7 +577,15 @@ if (startDate || endDate) {
             </div>
             <div>{customerData.mobileNumber}</div>
             <div className="text-red-500">
-             {(customerData.total.total < 0) ?<span className="text-green-500">মোট দিবেন: ৳  {customerData.total.total * -1}</span> :<span className="text-red-500">মোট পাবেন: ৳ {customerData.total.total}</span>}
+              {customerData.total.total < 0 ? (
+                <span className="text-green-500">
+                  মোট দিবেন: ৳ {customerData.total.total * -1}
+                </span>
+              ) : (
+                <span className="text-red-500">
+                  মোট পাবেন: ৳ {customerData.total.total}
+                </span>
+              )}
             </div>
           </div>
           {/* <div className="flex gap-2">
@@ -594,45 +604,49 @@ if (startDate || endDate) {
           </div> */}
         </div>
       </div>
-            {/* Date Filter Section */}
-            {/* Date Filter Section */}
-<div className="bg-gray-100 p-4 rounded-lg mb-4">
-  <h2 className="text-lg font-semibold mb-2">Filter by Date</h2>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
-      />
-    </div>
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
-      />
-    </div>
-  </div>
-  <div className="flex justify-end gap-2">
-    <button
-      onClick={clearDateFilters}
-      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-    >
-      Clear
-    </button>
-    <button
-      onClick={handleDateFilter}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-    >
-      Apply Filter
-    </button>
-  </div>
-</div>
+      {/* Date Filter Section */}
+      {/* Date Filter Section */}
+      <div className="bg-gray-100 p-4 rounded-lg mb-4">
+        <h2 className="text-lg font-semibold mb-2">Filter by Date</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              End Date
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={clearDateFilters}
+            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Clear
+          </button>
+          <button
+            onClick={handleDateFilter}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Apply Filter
+          </button>
+        </div>
+      </div>
 
       {/* View Button */}
       <div className="mb-4">
@@ -674,46 +688,48 @@ if (startDate || endDate) {
               <th className="text-right p-2 text-lg font-normal font-sans">
                 ব্যালেন্স
               </th>
-              <th className=" p-2 text-lg font-normal font-sans">
-                Action
-              </th>
+              <th className=" p-2 text-lg font-normal font-sans">Action</th>
             </tr>
           </thead>
           <tbody>
             {customerData.transactions.map((transaction) => (
               <>
-              <tr key={transaction._id} className="border-b shadow-md">
-  <td className="p-2 py-3">
-    {`${formatDate(transaction.date)}`}
-    <br />
-    {transaction.notes ? `নোট: ${transaction.notes}` : ''}
-  </td>
-  <td className="p-2 py-3 text-emerald-700 bg-green-100 text-right">
-    {transaction.taken > 0 ? `৳ ${transaction.taken}` : "-"}
-  </td>
-  <td className="text-right p-2 py-3 text-red-600 bg-red-100">
-    {transaction.given > 0 ? `৳ ${transaction.given}` : "-"}
-  </td>
-  <td className="text-right py-5 p-3">৳ {transaction.balance}</td>
-  <td className="text-center py-5 p-3">
-    <div className="flex gap-2 justify-center">
-      <button
-        className="text-blue-500 hover:text-blue-700"
-        onClick={() => openEditModal(transaction,`${transaction.given}`)}
-      >
-        <FiEdit size={18} />
-      </button>
-      <button
-        className="text-red-500 hover:text-red-700"
-        onClick={() => openDeleteModal(transaction)}
-      >
-        <FiTrash size={18} />
-      </button>
-    </div>
-  </td>
-</tr>
-               <tr className="h-3"></tr>
-               </>
+                <tr key={transaction._id} className="border-b shadow-md">
+                  <td className="p-2 py-3">
+                    {`${formatDate(transaction.date)}`}
+                    <br />
+                    {transaction.notes ? `নোট: ${transaction.notes}` : ""}
+                  </td>
+                  <td className="p-2 py-3 text-emerald-700 bg-green-100 text-right">
+                    {transaction.taken > 0 ? `৳ ${transaction.taken}` : "-"}
+                  </td>
+                  <td className="text-right p-2 py-3 text-red-600 bg-red-100">
+                    {transaction.given > 0 ? `৳ ${transaction.given}` : "-"}
+                  </td>
+                  <td className="text-right py-5 p-3">
+                    ৳ {transaction.balance}
+                  </td>
+                  <td className="text-center py-5 p-3">
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        className="text-blue-500 hover:text-blue-700"
+                        onClick={() =>
+                          openEditModal(transaction, `${transaction.given}`)
+                        }
+                      >
+                        <FiEdit size={18} />
+                      </button>
+                      <button
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => openDeleteModal(transaction)}
+                      >
+                        <FiTrash size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="h-3"></tr>
+              </>
             ))}
           </tbody>
           <tfoot>
@@ -849,33 +865,33 @@ if (startDate || endDate) {
         </div>
       )}
       {/* Edit Modal */}
-{showEditModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
-      <h2 className="text-xl font-bold mb-4">Edit Transaction</h2>
-      <form onSubmit={handleEditSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Amount</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            placeholder="Enter amount"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Notes</label>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            placeholder="Add notes (optional)"
-            rows="3"
-          />
-        </div>
-        {/* <div className="mb-4">
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4">Edit Transaction</h2>
+            <form onSubmit={handleEditSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Amount</label>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                  placeholder="Enter amount"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Notes</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                  placeholder="Add notes (optional)"
+                  rows="3"
+                />
+              </div>
+              {/* <div className="mb-4">
           <label className="flex items-center">
             <input
               type="checkbox"
@@ -886,52 +902,55 @@ if (startDate || endDate) {
             <span className="text-gray-700">দিচ্ছি (Giving)</span>
           </label>
         </div> */}
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => setShowEditModal(false)}
-            className="px-4 py-2 bg-gray-300 rounded"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={transactionLoading}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            {transactionLoading ? "Processing..." : "Update"}
-          </button>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={transactionLoading}
+                  className="px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                  {transactionLoading ? "Processing..." : "Update"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
-{/* Delete Confirmation Modal */}
-{showDeleteModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
-      <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
-      <p className="mb-6">Are you sure you want to delete this transaction? This action cannot be undone.</p>
-      <div className="flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => setShowDeleteModal(false)}
-          className="px-4 py-2 bg-gray-300 rounded"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleDeleteSubmit}
-          disabled={transactionLoading}
-          className="px-4 py-2 bg-red-500 text-white rounded"
-        >
-          {transactionLoading ? "Processing..." : "Delete"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
+            <p className="mb-6">
+              Are you sure you want to delete this transaction? This action
+              cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteSubmit}
+                disabled={transactionLoading}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+              >
+                {transactionLoading ? "Processing..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* View Summary Modal */}
       {showViewModal && (

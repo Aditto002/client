@@ -22,7 +22,7 @@ const DueHistory = () => {
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/due-history",
+        "https://bebsa-backend.vercel.app/api/due-history",
         {
           params: {
             page: currentPage,
@@ -42,7 +42,9 @@ const DueHistory = () => {
       // Set pagination data - calculate total pages if not provided by API
       const itemsPerPage = 10; // Adjust based on your API's pagination
       const totalItems = response.data.transactions?.length || 0;
-      setTotalPages(response.data.totalPages || Math.ceil(totalItems / itemsPerPage) || 1);
+      setTotalPages(
+        response.data.totalPages || Math.ceil(totalItems / itemsPerPage) || 1
+      );
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -87,10 +89,10 @@ const DueHistory = () => {
                 Customer
               </th>
               <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">
-              দিয়েছি
+                দিয়েছি
               </th>
               <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">
-              নিয়েছি
+                নিয়েছি
               </th>
               <th className="text-left py-4 px-6 text-gray-500 font-medium text-center">
                 Balance
@@ -138,9 +140,7 @@ const DueHistory = () => {
                   )}
                 </td>
                 <td
-                  className={`py-4 px-6 text-center font-medium ${
-                    transaction.balance 
-                  }`}
+                  className={`py-4 px-6 text-center font-medium ${transaction.balance}`}
                 >
                   {transaction.balance}
                 </td>

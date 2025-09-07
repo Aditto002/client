@@ -58,7 +58,7 @@ export default function CreditPage() {
 
       try {
         const response = await axios.get(
-          `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+          `https://bebsa-backend.vercel.app/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
             formData.company
           )}`
         );
@@ -141,7 +141,7 @@ export default function CreditPage() {
     try {
       // First try to search by the input as provided (could be name or number)
       const response = await axios.get(
-        `https://bebsa-backend.onrender.com/api/customers/search?customer=${encodeURIComponent(
+        `https://bebsa-backend.vercel.app/api/customers/search?customer=${encodeURIComponent(
           searchInput
         )}`
       );
@@ -157,10 +157,10 @@ export default function CreditPage() {
         // Additional search for numbers only if the input contains only digits
         try {
           const numberResponse = await axios.get(
-            `https://bebsa-backend.onrender.com/api/customers/search?mobileNumber=${encodeURIComponent(
+            `https://bebsa-backend.vercel.app/api/customers/search?mobileNumber=${encodeURIComponent(
               searchInput
             )}`
-          );  
+          );
 
           if (
             numberResponse.data &&
@@ -276,83 +276,84 @@ export default function CreditPage() {
     window.open(statementUrl, "_blank");
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    if (isSubmitting) return; // Prevent double-click
+    setIsSubmitting(true); // Lock submit
 
-  if (isSubmitting) return; // Prevent double-click
-  setIsSubmitting(true);     // Lock submit
-
-  // Validate required fields before submission
-  if (!formData.customerName || !formData.customerNumber) {
-    toast.error("Customer information is required");
-    setIsSubmitting(false);
-    return;
-  }
-
-  if (!formData.company || !formData.selectedAccount) {
-    toast.error("Company and number selection is required");
-    setIsSubmitting(false);
-    return;
-  }
-
-  try {
-    console.log("data", formData);
-    const response = await axios.post(
-      `https://bebsa-backend.onrender.com/api/credit`,
-      formData
-    );
-    console.log("Success:", response.data);
-    toast.success("Transaction submitted successfully!");
-
-    // After successful submission, refetch the updated balance
-    try {
-      const updatedCompanyResponse = await axios.get(
-        `https://bebsa-backend.onrender.com/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
-          formData.company
-        )}`
-      );
-
-      if (updatedCompanyResponse.data && updatedCompanyResponse.data.success) {
-        const updatedAccount = updatedCompanyResponse.data.data.find(
-          (item) => item && item.mobileNumber === formData.selectedAccount
-        );
-
-        if (updatedAccount && updatedAccount.totalAmount !== undefined) {
-          setFormData((prev) => ({
-            ...prev,
-            customerName: "",
-            customerNumber: "",
-            previousAmount: updatedAccount.totalAmount.toString(),
-            newAmount: 0,
-            remarks: "",
-          }));
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching updated balance:", error);
-      // Still reset basic fields
-      setFormData((prev) => ({
-        ...prev,
-        customerName: "",
-        customerNumber: "",
-        newAmount: 0,
-        remarks: "",
-      }));
+    // Validate required fields before submission
+    if (!formData.customerName || !formData.customerNumber) {
+      toast.error("Customer information is required");
+      setIsSubmitting(false);
+      return;
     }
 
-    setSearchTerm("");
-  } catch (error) {
-    console.error(
-      "Error submitting transaction:",
-      error.response?.data || error.message
-    );
-    toast.error("Failed to submit transaction. Please try again.");
-  } finally {
-    setIsSubmitting(false); // Re-enable submit
-  }
-};
+    if (!formData.company || !formData.selectedAccount) {
+      toast.error("Company and number selection is required");
+      setIsSubmitting(false);
+      return;
+    }
 
+    try {
+      console.log("data", formData);
+      const response = await axios.post(
+        `https://bebsa-backend.vercel.app/api/credit`,
+        formData
+      );
+      console.log("Success:", response.data);
+      toast.success("Transaction submitted successfully!");
+
+      // After successful submission, refetch the updated balance
+      try {
+        const updatedCompanyResponse = await axios.get(
+          `https://bebsa-backend.vercel.app/api/mobileAccounts/company?selectCompany=${encodeURIComponent(
+            formData.company
+          )}`
+        );
+
+        if (
+          updatedCompanyResponse.data &&
+          updatedCompanyResponse.data.success
+        ) {
+          const updatedAccount = updatedCompanyResponse.data.data.find(
+            (item) => item && item.mobileNumber === formData.selectedAccount
+          );
+
+          if (updatedAccount && updatedAccount.totalAmount !== undefined) {
+            setFormData((prev) => ({
+              ...prev,
+              customerName: "",
+              customerNumber: "",
+              previousAmount: updatedAccount.totalAmount.toString(),
+              newAmount: 0,
+              remarks: "",
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching updated balance:", error);
+        // Still reset basic fields
+        setFormData((prev) => ({
+          ...prev,
+          customerName: "",
+          customerNumber: "",
+          newAmount: 0,
+          remarks: "",
+        }));
+      }
+
+      setSearchTerm("");
+    } catch (error) {
+      console.error(
+        "Error submitting transaction:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to submit transaction. Please try again.");
+    } finally {
+      setIsSubmitting(false); // Re-enable submit
+    }
+  };
 
   // Calculate total with null/undefined check
   const calculateTotal = () => {

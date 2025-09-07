@@ -25,16 +25,22 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post("https://bebsa-backend.onrender.com/api/user/login", credentials);
+      const response = await axios.post(
+        "https://bebsa-backend.vercel.app/api/user/login",
+        credentials
+      );
 
       if (response.data.success) {
         // Store token in localStorage
         localStorage.setItem("authToken", response.data.token);
 
         // Decode token to get user details
-        const decodeResponse = await axios.post("https://bebsa-backend.onrender.com/api/user/decode", {
-          token: response.data.token,
-        });
+        const decodeResponse = await axios.post(
+          "https://bebsa-backend.vercel.app/api/user/decode",
+          {
+            token: response.data.token,
+          }
+        );
 
         if (decodeResponse.data.success) {
           // Store user data in localStorage or state management

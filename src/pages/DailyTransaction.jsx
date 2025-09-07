@@ -2,8 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import {
   FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
   FiChevronUp,
   FiDownload,
   FiEdit,
@@ -15,7 +13,6 @@ import {
 import { jsPDF } from "jspdf";
 // Import autoTable plugin
 import autoTable from "jspdf-autotable";
-import { Link } from "react-router-dom";
 // Import toast
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -75,12 +72,11 @@ const DailyTransaction = () => {
       // Only add date parameters if they're not empty
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
-//       if (startDate) params.startDate = new Date(startDate).toISOString().split('T')[0].replace(/-/g, '/');
-// if (endDate) params.endDate = new Date(endDate).toISOString().split('T')[0].replace(/-/g, '/');
-
+      //       if (startDate) params.startDate = new Date(startDate).toISOString().split('T')[0].replace(/-/g, '/');
+      // if (endDate) params.endDate = new Date(endDate).toISOString().split('T')[0].replace(/-/g, '/');
 
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/credit/personal",
+        "https://bebsa-backend.vercel.app/api/credit/personal",
         {
           params: params,
         }
@@ -89,7 +85,7 @@ const DailyTransaction = () => {
       // Check if response data has expected structure
       if (response.data && response.data.data) {
         setTransactions(response.data.data.customers || []);
-        console.log("data",response.data.data.customers)
+        console.log("data", response.data.data.customers);
         setTotalAmount(response.data.data);
         console.log("object", totalAmount);
         setTotalPages(response.data.data.pagination?.totalPages || 1);
@@ -124,12 +120,12 @@ const DailyTransaction = () => {
       if (endDate) params.endDate = endDate;
 
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/credit/download-pdf",
+        "https://bebsa-backend.vercel.app/api/credit/download-pdf",
         {
           params: params,
         }
       );
-         
+
       if (response.data && response.data.data && response.data.data.customers) {
         setPDFData(response.data.data.customers);
       } else {
@@ -215,17 +211,17 @@ const DailyTransaction = () => {
       //   60
       // );
       const currentDate = new Date();
-const day = String(currentDate.getDate()).padStart(2, '0');
-const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-const year = currentDate.getFullYear();
-const formattedDate = `${day}/${month}/${year}`;
-const formattedTime = currentDate.toLocaleTimeString();
-const generatedText = `Generated on: ${formattedDate} at ${formattedTime}`;
-doc.text(
-  generatedText,
-  (pageWidth - doc.getTextWidth(generatedText)) / 2,
-  60
-);
+      const day = String(currentDate.getDate()).padStart(2, "0");
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+      const year = currentDate.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+      const formattedTime = currentDate.toLocaleTimeString();
+      const generatedText = `Generated on: ${formattedDate} at ${formattedTime}`;
+      doc.text(
+        generatedText,
+        (pageWidth - doc.getTextWidth(generatedText)) / 2,
+        60
+      );
 
       // Format transaction data for the table
       const tableData = transactions.map((transaction) => [
@@ -233,7 +229,7 @@ doc.text(
         transaction.newAmount || "",
         transaction.customerNumber || "",
         transaction.selectedAccount || "",
-        transaction.totalBalance || "",// change selectedNumber
+        transaction.totalBalance || "", // change selectedNumber
         transaction.remarks || "",
       ]);
 
@@ -279,32 +275,39 @@ doc.text(
 
       // Save the PDF
       // Get your dates from wherever you're currently getting them
-// Then format them:
-const formatDate = (date) => {
-  const d = new Date(date);
-  return d.getDate().toString().padStart(2, '0') + '/' + 
-         (d.getMonth() + 1).toString().padStart(2, '0') + '/' + 
-         d.getFullYear();
-};
+      // Then format them:
+      const formatDate = (date) => {
+        const d = new Date(date);
+        return (
+          d.getDate().toString().padStart(2, "0") +
+          "/" +
+          (d.getMonth() + 1).toString().padStart(2, "0") +
+          "/" +
+          d.getFullYear()
+        );
+      };
 
-// Format both dates
-const formattedStartDate = startDate ? formatDate(startDate) : '';
-const formattedEndDate = endDate ? formatDate(endDate) : '';
+      // Format both dates
+      const formattedStartDate = startDate ? formatDate(startDate) : "";
+      const formattedEndDate = endDate ? formatDate(endDate) : "";
 
-// Create current date for the default filename
-const today = new Date();
-const formattedToday = today.getDate().toString().padStart(2, '0') + '/' + 
-                       (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
-                       today.getFullYear();
+      // Create current date for the default filename
+      const today = new Date();
+      const formattedToday =
+        today.getDate().toString().padStart(2, "0") +
+        "/" +
+        (today.getMonth() + 1).toString().padStart(2, "0") +
+        "/" +
+        today.getFullYear();
 
-// Use the formatted dates in the filename
-const fileName =
-  startDate && endDate
-    ? `DAILY_TRANSACTION_SHEET_${formattedStartDate}_to_${formattedEndDate}.pdf`
-    : `DAILY_TRANSACTION_SHEET_${formattedToday}.pdf`;
+      // Use the formatted dates in the filename
+      const fileName =
+        startDate && endDate
+          ? `DAILY_TRANSACTION_SHEET_${formattedStartDate}_to_${formattedEndDate}.pdf`
+          : `DAILY_TRANSACTION_SHEET_${formattedToday}.pdf`;
       // const date = new Date();
-      // const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' + 
-      //                      (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+      // const formattedDateS = date.getDate().toString().padStart(2, '0') + '/' +
+      //                      (date.getMonth() + 1).toString().padStart(2, '0') + '/' +
       //                      date.getFullYear();
       // const fileName =
       //   startDate && endDate
@@ -360,7 +363,7 @@ const fileName =
 
       // Use the _id in the API endpoint
       await axios.put(
-        `https://bebsa-backend.onrender.com/api/credit/${updateData._id}`,
+        `https://bebsa-backend.vercel.app/api/credit/${updateData._id}`,
         updateData
       );
       setIsUpdateModalOpen(false);
@@ -396,7 +399,7 @@ const fileName =
       }
 
       await axios.delete(
-        `https://bebsa-backend.onrender.com/api/credit/${deleteId}`
+        `https://bebsa-backend.vercel.app/api/credit/${deleteId}`
       );
       setIsDeleteConfirmOpen(false);
       fetchTransactions(); // Refresh data after delete
@@ -428,7 +431,7 @@ const fileName =
         draggable
         pauseOnHover
       />
-      
+
       <div className="text-center mb-10 mt-10">
         <h1 className="text-4xl font-bold">Daily Transaction Register</h1>
       </div>
@@ -472,7 +475,6 @@ const fileName =
               onChange={(e) => setTempStartDate(e.target.value)}
               className="p-2 border rounded w-40 sm:w-52 md:w-60"
             />
-
           </div>
 
           <div className="flex flex-col">
@@ -512,21 +514,16 @@ const fileName =
               )}
             </button>
           </div>
-          <div>
-            
-          </div>
-          
+          <div></div>
 
           <div className="ml-auto text-lg font-semibold  text-gray-600 rounded-md flex items-center gap-5">
             <div className=" bg-green-100 py-2 px-3 rounded-md">
-
-            <p>Total Amount: {totalAmount?.totalAmount || 0}</p>
+              <p>Total Amount: {totalAmount?.totalAmount || 0}</p>
             </div>
-             <div className=" bg-green-100 py-2 px-3 rounded-md">
-             <p>Total Remarks: {totalAmount?.totalRemarks || 0}</p>
-             </div>
+            <div className=" bg-green-100 py-2 px-3 rounded-md">
+              <p>Total Remarks: {totalAmount?.totalRemarks || 0}</p>
+            </div>
           </div>
-          
         </div>
         {/* Total Amount */}
       </div>

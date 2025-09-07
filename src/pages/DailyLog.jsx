@@ -8,7 +8,6 @@ import {
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
-
 const DailyLog = () => {
   const [transactions, setTransactions] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
@@ -23,7 +22,7 @@ const DailyLog = () => {
   const fetchTransactions = async () => {
     try {
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/mobileAccounts/today-log",
+        "https://bebsa-backend.vercel.app/api/mobileAccounts/today-log",
         {
           params: {
             page: currentPage,
@@ -271,37 +270,35 @@ const DailyLog = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-between">
-      <Link
-            to="/"
-             className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
-            >
-               Back
-            </Link>
+        <Link
+          to="/"
+          className="bg-gray-500 mt-5 text-white px-6 py-2 rounded-md hover:bg-gray-600"
+        >
+          Back
+        </Link>
         <div>
-
-      <div className="mt-4 flex justify-center items-center space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-        >
-          <FiChevronLeft />
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-          className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
-        >
-          <FiChevronRight />
-        </button>
-      </div>
+          <div className="mt-4 flex justify-center items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+            >
+              <FiChevronLeft />
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="p-2 border rounded hover:bg-gray-100 disabled:opacity-50"
+            >
+              <FiChevronRight />
+            </button>
+          </div>
         </div>
-
       </div>
     </div>
   );

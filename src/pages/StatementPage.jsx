@@ -1,442 +1,442 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+import axios from "axios";
+import { useEffect, useState } from "react";
 import {
   FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
   FiChevronUp,
   FiDownload,
-  FiX,
-  FiEdit,
   FiTrash,
-} from 'react-icons/fi'
+  FiX,
+} from "react-icons/fi";
 // Import jsPDF correctly
-import { jsPDF } from 'jspdf'
+import { jsPDF } from "jspdf";
 // Import autoTable plugin with proper syntax
-import { autoTable } from 'jspdf-autotable'
-import { Link } from 'react-router-dom'
+import { autoTable } from "jspdf-autotable";
 
 const StatementPage = () => {
-  const [transactions, setTransactions] = useState([])
-  const [totalAmount, setTotalAmount] = useState({ totalAmount: 0 })
-  const [expandedRow, setExpandedRow] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [tempStartDate, setTempStartDate] = useState('')
-  const [tempEndDate, setTempEndDate] = useState('')
-  const [selectCompany, setSelectCompany] = useState('')
-  const [selectedNumber, setSelectedNumber] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [transactions, setTransactions] = useState([]);
+  const [totalAmount, setTotalAmount] = useState({ totalAmount: 0 });
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [tempStartDate, setTempStartDate] = useState("");
+  const [tempEndDate, setTempEndDate] = useState("");
+  const [selectCompany, setSelectCompany] = useState("");
+  const [selectedNumber, setSelectedNumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Add state for update modal
-  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [updateData, setUpdateData] = useState({
-    _id: '',
-    selectCompany: '',
-    totalAmount: '',
-    mobileNumber: '',
-  })
+    _id: "",
+    selectCompany: "",
+    totalAmount: "",
+    mobileNumber: "",
+  });
 
   // Add state for delete confirmation
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [deleteId, setDeleteId] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     // Extract parameters from URL on component mount
-    const queryParams = new URLSearchParams(window.location.search)
-    const companyFromUrl = queryParams.get('selectCompany')
-    const numberFromUrl = queryParams.get('selectedNumber')
-    const startDateFromUrl = queryParams.get('startDate')
-    const endDateFromUrl = queryParams.get('endDate')
+    const queryParams = new URLSearchParams(window.location.search);
+    const companyFromUrl = queryParams.get("selectCompany");
+    const numberFromUrl = queryParams.get("selectedNumber");
+    const startDateFromUrl = queryParams.get("startDate");
+    const endDateFromUrl = queryParams.get("endDate");
 
     // Set state with URL parameters
-    if (companyFromUrl) setSelectCompany(companyFromUrl)
-    if (numberFromUrl) setSelectedNumber(numberFromUrl)
+    if (companyFromUrl) setSelectCompany(companyFromUrl);
+    if (numberFromUrl) setSelectedNumber(numberFromUrl);
     if (startDateFromUrl) {
-      setStartDate(startDateFromUrl)
-      setTempStartDate(startDateFromUrl)
+      setStartDate(startDateFromUrl);
+      setTempStartDate(startDateFromUrl);
     }
     if (endDateFromUrl) {
-      setEndDate(endDateFromUrl)
-      setTempEndDate(endDateFromUrl)
+      setEndDate(endDateFromUrl);
+      setTempEndDate(endDateFromUrl);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     // Only fetch when we have the necessary data from URL
     if (selectCompany || selectedNumber || startDate || endDate) {
-      fetchTransactions()
+      fetchTransactions();
     }
-  }, [currentPage, startDate, endDate, selectCompany, selectedNumber])
+  }, [currentPage, startDate, endDate, selectCompany, selectedNumber]);
 
   const fetchTransactions = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       // Prepare params object, only including parameters if they have values
       const params = {
         page: currentPage,
-      }
+      };
 
       // Only add parameters if they're not empty
-      if (startDate) params.startDate = startDate
-      if (endDate) params.endDate = endDate
-      if (selectCompany) params.selectCompany = selectCompany
-      if (selectedNumber) params.selectedNumber = selectedNumber
-      
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (selectCompany) params.selectCompany = selectCompany;
+      if (selectedNumber) params.selectedNumber = selectedNumber;
 
       // Use the new API endpoint for account data
       const response = await axios.get(
-        'https://bebsa-backend.onrender.com/api/credit/account-datas',
+        "https://bebsa-backend.vercel.app/api/credit/account-datas",
         {
           params: params,
         }
-      )
+      );
 
       // Set transactions from the response
-      setTransactions(response.data.data)
+      setTransactions(response.data.data);
 
       // Set pagination information
       if (response.data.pagination) {
-        setTotalPages(response.data.pagination.totalPages)
+        setTotalPages(response.data.pagination.totalPages);
       }
 
       // Calculate total amount separately for credit and debit
       const totals = response.data.data.reduce(
         (acc, transaction) => {
           if (transaction.isCredit) {
-            acc.totalCredit += transaction.newAmount || transaction.amount || 0
+            acc.totalCredit += transaction.newAmount || transaction.amount || 0;
           } else {
-            acc.totalDebit += transaction.newAmount || transaction.amount || 0
+            acc.totalDebit += transaction.newAmount || transaction.amount || 0;
           }
-          return acc
+          return acc;
         },
         { totalCredit: 0, totalDebit: 0 }
-      )
+      );
 
       setTotalAmount({
         totalCredit: totals.totalCredit,
         totalDebit: totals.totalDebit,
         totalBalance: totals.totalCredit - totals.totalDebit,
-      })
+      });
     } catch (error) {
-      console.error('Error fetching transactions:', error)
+      console.error("Error fetching transactions:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Function to fetch all transactions for PDF without pagination
   const fetchAllTransactionsForPDF = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       // Prepare params object for fetching all data
       const params = {
         limit: 1000, // Set a high limit to get all data in one request
-      }
+      };
 
       // Only add parameters if they're not empty
-      if (startDate) params.startDate = startDate
-      if (endDate) params.endDate = endDate
-      if (selectCompany) params.selectCompany = selectCompany
-      if (selectedNumber) params.selectedNumber = selectedNumber
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      if (selectCompany) params.selectCompany = selectCompany;
+      if (selectedNumber) params.selectedNumber = selectedNumber;
 
       // Use the same endpoint but with a high limit
       const response = await axios.get(
-        'https://bebsa-backend.onrender.com/api/credit/account-datas',
+        "https://bebsa-backend.vercel.app/api/credit/account-datas",
         {
           params: params,
         }
-      )
+      );
 
-      return response.data.data
+      return response.data.data;
     } catch (error) {
-      console.error('Error fetching all transactions for PDF:', error)
-      return []
+      console.error("Error fetching all transactions for PDF:", error);
+      return [];
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleApplyFilters = () => {
-    setStartDate(tempStartDate)
-    setEndDate(tempEndDate)
-    setCurrentPage(1) // Reset pagination to first page
-  }
+    setStartDate(tempStartDate);
+    setEndDate(tempEndDate);
+    setCurrentPage(1); // Reset pagination to first page
+  };
 
   // Function to format date to human readable format
   const formatDate = (dateString) => {
     const options = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }
-    return new Date(dateString).toLocaleDateString('en-US', options)
-  }
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
 
   // Function to get transaction type
   const getTransactionType = (isCredit) => {
-    return isCredit ? 'Credit' : 'Debit'
-  }
+    return isCredit ? "Credit" : "Debit";
+  };
 
   // Update the getTransactionBalance function
   const getTransactionBalance = (transaction) => {
     // Use the balance field calculated by the backend
-    return transaction.totalBalance || 0
-  }
+    return transaction.totalBalance || 0;
+  };
   // Function to open update modal with pre-populated data
   const handleUpdateClick = (transaction) => {
     // Check if transaction has _id property, if not use id
-    const transactionId = transaction._id || transaction.id
+    const transactionId = transaction._id || transaction.id;
 
     if (!transactionId) {
-      console.error('Transaction ID is missing', transaction)
-      alert('Error: Transaction ID is missing')
-      return
+      console.error("Transaction ID is missing", transaction);
+      alert("Error: Transaction ID is missing");
+      return;
     }
 
     setUpdateData({
       _id: transactionId, // Use the correct ID property name
       selectCompany: transaction.company,
       totalAmount: transaction.newAmount || transaction.amount,
-      mobileNumber: transaction.selectedNumber || '',
-    })
-    setShowUpdateModal(true)
-  }
+      mobileNumber: transaction.selectedNumber || "",
+    });
+    setShowUpdateModal(true);
+  };
 
   // Function to handle input changes in update modal
   const handleUpdateInputChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setUpdateData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   // Function to submit update
   const handleUpdateSubmit = async () => {
     try {
       if (!updateData._id) {
-        console.error('Update ID is missing', updateData)
-        alert('Error: Update ID is missing')
-        return
+        console.error("Update ID is missing", updateData);
+        alert("Error: Update ID is missing");
+        return;
       }
 
       await axios.put(
-        `https://bebsa-backend.onrender.com/api/credit/${updateData._id}`,
+        `https://bebsa-backend.vercel.app/api/credit/${updateData._id}`,
         updateData
-      )
-      setShowUpdateModal(false)
-      fetchTransactions() // Refresh the data
-      alert('Record updated successfully')
+      );
+      setShowUpdateModal(false);
+      fetchTransactions(); // Refresh the data
+      alert("Record updated successfully");
     } catch (error) {
-      console.error('Error updating record:', error)
-      alert('Error updating record: ' + error.message)
+      console.error("Error updating record:", error);
+      alert("Error updating record: " + error.message);
     }
-  }
+  };
 
   // Function to open delete confirmation
-  const handleDeleteClick = (id,isCredit) => {
+  const handleDeleteClick = (id, isCredit) => {
     // Check if we got a valid ID
     if (!id) {
-      console.error('Invalid ID for deletion', id)
-      alert('Error: Invalid ID for deletion')
-      return
+      console.error("Invalid ID for deletion", id);
+      alert("Error: Invalid ID for deletion");
+      return;
     }
-    const delethandle ={
+    const delethandle = {
       id,
       isCredit,
-      selectedCompany:selectCompany,
-      selectedAccount:selectedNumber
-    }
+      selectedCompany: selectCompany,
+      selectedAccount: selectedNumber,
+    };
 
-    setDeleteId(delethandle)
-    setShowDeleteConfirm(true)
-  }
+    setDeleteId(delethandle);
+    setShowDeleteConfirm(true);
+  };
 
   // Function to confirm and execute delete
   const confirmDelete = async () => {
     try {
       if (!deleteId) {
-        console.error('Delete ID is missing')
-        alert('Error: Delete ID is missing')
-        return
+        console.error("Delete ID is missing");
+        alert("Error: Delete ID is missing");
+        return;
       }
-      console.log("data", deleteId)
+      console.log("data", deleteId);
       await axios.post(
-        `https://bebsa-backend.onrender.com/api/credit/statement-delete`,deleteId
-      )
-      setShowDeleteConfirm(false)
-      fetchTransactions() // Refresh the data
-      alert('Record deleted successfully')
+        `https://bebsa-backend.vercel.app/api/credit/statement-delete`,
+        deleteId
+      );
+      setShowDeleteConfirm(false);
+      fetchTransactions(); // Refresh the data
+      alert("Record deleted successfully");
     } catch (error) {
-      console.error('Error deleting record:', error)
-      alert('Error deleting record: ' + error.message)
+      console.error("Error deleting record:", error);
+      alert("Error deleting record: " + error.message);
     }
-  }
+  };
 
   const downloadTransactionsPDF = async () => {
     try {
-      console.log('Download PDF function called')
-      setLoading(true)
+      console.log("Download PDF function called");
+      setLoading(true);
 
       // Fetch all transactions for PDF without pagination
-      const allTransactions = await fetchAllTransactionsForPDF()
+      const allTransactions = await fetchAllTransactionsForPDF();
 
       if (!allTransactions || allTransactions.length === 0) {
-        console.error('No transactions data available to download')
-        alert('No transactions data available to download')
-        return
+        console.error("No transactions data available to download");
+        alert("No transactions data available to download");
+        return;
       }
 
       // Initialize jsPDF - use portrait orientation
-      const doc = new jsPDF('p', 'mm', 'a4')
-      const pageWidth = doc.internal.pageSize.getWidth() // Get page width
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = doc.internal.pageSize.getWidth(); // Get page width
 
-      doc.setFontSize(18)
+      doc.setFontSize(18);
 
       // Center "Deb Telecom"
-      const title = 'Deb Telecom'
-      doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22)
+      const title = "Deb Telecom";
+      doc.text(title, (pageWidth - doc.getTextWidth(title)) / 2, 22);
 
       // Center "Moulvibazar Road, Afrozganj Bazar Sherpur"
-      const address = 'Moulvibazar Road, Afrozganj Bazar Sherpur'
-      doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30)
+      const address = "Moulvibazar Road, Afrozganj Bazar Sherpur";
+      doc.text(address, (pageWidth - doc.getTextWidth(address)) / 2, 30);
 
       // Center "Daily Transaction Register"
-      const subtitle = 'Daily Transaction Register'
-      doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38)
+      const subtitle = "Daily Transaction Register";
+      doc.text(subtitle, (pageWidth - doc.getTextWidth(subtitle)) / 2, 38);
 
       // Add report metadata
-      doc.setFontSize(11)
+      doc.setFontSize(11);
 
       const dateRangeText =
         startDate && endDate
           ? `Date Range: ${startDate} to ${endDate}`
-          : 'Date Range: All dates'
+          : "Date Range: All dates";
       doc.text(
         dateRangeText,
         (pageWidth - doc.getTextWidth(dateRangeText)) / 2,
         48
-      )
+      );
 
-      const accountText = `Account: ${selectCompany || 'All'} - ${
-        selectedNumber || 'All'
-      }`
-      doc.text(accountText, (pageWidth - doc.getTextWidth(accountText)) / 2, 54)
+      const accountText = `Account: ${selectCompany || "All"} - ${
+        selectedNumber || "All"
+      }`;
+      doc.text(
+        accountText,
+        (pageWidth - doc.getTextWidth(accountText)) / 2,
+        54
+      );
 
       // Calculate totals for PDF
       const totals = allTransactions.reduce(
         (acc, transaction) => {
           if (transaction.isCredit) {
-            acc.totalCredit += transaction.newAmount || transaction.amount || 0
+            acc.totalCredit += transaction.newAmount || transaction.amount || 0;
           } else {
-            acc.totalDebit += transaction.newAmount || transaction.amount || 0
+            acc.totalDebit += transaction.newAmount || transaction.amount || 0;
           }
-          return acc
+          return acc;
         },
         { totalCredit: 0, totalDebit: 0 }
-      )
+      );
 
-      const totalCreditText = `Total Credit: ${totals.totalCredit}`
+      const totalCreditText = `Total Credit: ${totals.totalCredit}`;
       doc.text(
         totalCreditText,
         (pageWidth - doc.getTextWidth(totalCreditText)) / 2,
         60
-      )
+      );
 
-      const totalDebitText = `Total Debit: ${totals.totalDebit}`
+      const totalDebitText = `Total Debit: ${totals.totalDebit}`;
       doc.text(
         totalDebitText,
         (pageWidth - doc.getTextWidth(totalDebitText)) / 2,
         66
-      )
+      );
 
       const totalBalanceText = `Total Balance: ${
         totals.totalCredit - totals.totalDebit
-      }`
+      }`;
       doc.text(
         totalBalanceText,
         (pageWidth - doc.getTextWidth(totalBalanceText)) / 2,
         72
-      )
+      );
 
-      const generatedText = `Generated on: ${new Date().toLocaleString()}`
+      const generatedText = `Generated on: ${new Date().toLocaleString()}`;
       doc.text(
         generatedText,
         (pageWidth - doc.getTextWidth(generatedText)) / 2,
         78
-      )
+      );
 
       // Format transaction data for the table
       const tableData = allTransactions.map((transaction) => [
         formatDate(transaction.createdAt),
         getTransactionType(transaction.isCredit),
-        transaction.remarks || '',
+        transaction.remarks || "",
         transaction.isCredit
-          ? transaction.newAmount || transaction.amount || ''
-          : '0',
+          ? transaction.newAmount || transaction.amount || ""
+          : "0",
         !transaction.isCredit
-          ? transaction.newAmount || transaction.amount || ''
-          : '0',
+          ? transaction.newAmount || transaction.amount || ""
+          : "0",
         getTransactionBalance(transaction),
-        transaction.entryBy || '',
-      ])
+        transaction.entryBy || "",
+      ]);
 
       // Define table columns - new order
       const headers = [
-        'Date',
-        'Type',
-        'Remarks',
-        'Credit',
-        'Debit',
-        'Balance',
-        'Entry By',
-      ]
+        "Date",
+        "Type",
+        "Remarks",
+        "Credit",
+        "Debit",
+        "Balance",
+        "Entry By",
+      ];
 
       // Add transactions table with auto table and capture the final Y position
-      let finalY
+      let finalY;
       autoTable(doc, {
         startY: 88,
         head: [headers],
         body: tableData,
-        theme: 'grid',
+        theme: "grid",
         headStyles: { fillColor: [66, 66, 66] },
         alternateRowStyles: { fillColor: [240, 240, 240] },
         margin: { top: 48 },
         didDrawPage: (data) => {
-          finalY = data.cursor.y // This captures the Y position after the table is drawn
+          finalY = data.cursor.y; // This captures the Y position after the table is drawn
         },
-      })
+      });
 
       // Add horizontal line after the table
-      doc.setDrawColor(0) // Black color
-      doc.setLineWidth(0.5) // Line width
-      doc.line(10, finalY + 10, pageWidth - 10, finalY + 10) // Draw line
+      doc.setDrawColor(0); // Black color
+      doc.setLineWidth(0.5); // Line width
+      doc.line(10, finalY + 10, pageWidth - 10, finalY + 10); // Draw line
 
       // Add total amount text below the line
-      doc.setFontSize(12)
-      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
 
       // Save the PDF
       const fileName =
         startDate && endDate
           ? `transactions_${startDate}_to_${endDate}.pdf`
-          : `transactions_all_dates.pdf`
-      console.log('Saving PDF with filename:', fileName)
-      doc.save(fileName)
+          : `transactions_all_dates.pdf`;
+      console.log("Saving PDF with filename:", fileName);
+      doc.save(fileName);
 
-      console.log('PDF download complete')
+      console.log("PDF download complete");
     } catch (error) {
-      console.error('Error generating PDF:', error)
-      alert('Error generating PDF: ' + error.message)
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF: " + error.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-5xl">
@@ -488,7 +488,7 @@ const StatementPage = () => {
               disabled={loading}
             >
               {loading ? (
-                'Processing...'
+                "Processing..."
               ) : (
                 <>
                   <FiDownload size={14} /> Download PDF
@@ -532,36 +532,38 @@ const StatementPage = () => {
               <tr
                 key={transaction._id || transaction.id}
                 className={`border-b border-gray-200 ${
-                  index % 2 === 1 ? 'bg-gray-50' : 'bg-white'
+                  index % 2 === 1 ? "bg-gray-50" : "bg-white"
                 }`}
               >
                 <td className="py-4 px-4 text-gray-700">
                   {formatDate(transaction.createdAt)}
                 </td>
                 <td className="py-4 px-4 text-gray-700">
-                  {transaction.remarks || ''}
+                  {transaction.remarks || ""}
                 </td>
                 <td className="py-4 px-4 text-green-600 text-right">
                   {transaction.isCredit
-                    ? transaction.newAmount || transaction.amount || ''
-                    : '0'}
+                    ? transaction.newAmount || transaction.amount || ""
+                    : "0"}
                 </td>
                 <td className="py-4 px-4 text-red-600 text-right">
                   {!transaction.isCredit
-                    ? transaction.newAmount || transaction.amount || ''
-                    : '0'}
+                    ? transaction.newAmount || transaction.amount || ""
+                    : "0"}
                 </td>
                 <td className="py-4 px-4 text-gray-700 text-right">
                   {getTransactionBalance(transaction)}
                 </td>
                 <td className="py-4 px-4 text-gray-700">
-                  {transaction.entryBy || ''}
+                  {transaction.entryBy || ""}
                 </td>
                 <td className="py-4 px-4 text-gray-700">
                   {index === 0 ? (
                     <button
                       className="text-gray-500 hover:text-gray-700"
-                      onClick={() => handleDeleteClick(transaction._id,transaction.isCredit)}
+                      onClick={() =>
+                        handleDeleteClick(transaction._id, transaction.isCredit)
+                      }
                     >
                       <FiTrash size={18} />
                     </button>
@@ -602,11 +604,11 @@ const StatementPage = () => {
                 <div className="text-right">
                   {transaction.isCredit ? (
                     <div className="font-bold text-green-600">
-                      +{transaction.newAmount || transaction.amount || '0'}
+                      +{transaction.newAmount || transaction.amount || "0"}
                     </div>
                   ) : (
                     <div className="font-bold text-red-600">
-                      -{transaction.newAmount || transaction.amount || '0'}
+                      -{transaction.newAmount || transaction.amount || "0"}
                     </div>
                   )}
                   <div className="text-sm text-gray-500">
@@ -617,7 +619,9 @@ const StatementPage = () => {
                   {index === 0 && (
                     <button
                       className="text-gray-500 hover:text-gray-700 mr-2"
-                      onClick={() => handleDeleteClick(transaction._id,transaction.isCredit)}
+                      onClick={() =>
+                        handleDeleteClick(transaction._id, transaction.isCredit)
+                      }
                     >
                       <FiTrash size={18} />
                     </button>
@@ -646,37 +650,37 @@ const StatementPage = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm text-gray-500">Remarks:</div>
                     <div className="text-sm text-gray-900">
-                      {transaction.remarks || ''}
+                      {transaction.remarks || ""}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm text-gray-500">
-                      {transaction.isCredit ? 'Credit:' : 'Debit:'}
+                      {transaction.isCredit ? "Credit:" : "Debit:"}
                     </div>
                     <div
                       className={`text-sm ${
-                        transaction.isCredit ? 'text-green-600' : 'text-red-600'
+                        transaction.isCredit ? "text-green-600" : "text-red-600"
                       }`}
                     >
-                      {transaction.newAmount || transaction.amount || '0'}
+                      {transaction.newAmount || transaction.amount || "0"}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm text-gray-500">Company:</div>
                     <div className="text-sm text-gray-900">
-                      {transaction.company || ''}
+                      {transaction.company || ""}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm text-gray-500">Account:</div>
                     <div className="text-sm text-gray-900">
-                      {transaction.selectedAccount || ''}
+                      {transaction.selectedAccount || ""}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="text-sm text-gray-500">Entry By:</div>
                     <div className="text-sm text-gray-900">
-                      {transaction.entryBy || ''}
+                      {transaction.entryBy || ""}
                     </div>
                   </div>
                 </div>
@@ -826,7 +830,7 @@ const StatementPage = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default StatementPage
+export default StatementPage;

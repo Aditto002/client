@@ -1,4 +1,6 @@
 import axios from "axios";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useEffect, useState } from "react";
 import {
   FiAlertCircle,
@@ -7,27 +9,25 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiChevronUp,
-  FiInfo,
-  FiSearch,
-  FiX,
-  FiUser,
-  FiPhone,
   FiDownload,
-  FiPlus,
   FiEdit,
+  FiInfo,
+  FiPhone,
+  FiPlus,
+  FiSearch,
   FiTrash,
+  FiUser,
+  FiX,
 } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 const Toast = ({ message, type, onClose }) => {
   const bgColor =
     type === "success"
       ? "bg-green-500"
       : type === "error"
-        ? "bg-red-500"
-        : "bg-blue-500";
+      ? "bg-red-500"
+      : "bg-blue-500";
 
   const Icon =
     type === "success" ? FiCheck : type === "error" ? FiAlertCircle : FiInfo;
@@ -40,7 +40,10 @@ const Toast = ({ message, type, onClose }) => {
         <Icon size={20} />
       </div>
       <div className="flex-1 font-medium">{message}</div>
-      <button onClick={onClose} className="ml-2 hover:text-gray-200 transition-colors">
+      <button
+        onClick={onClose}
+        className="ml-2 hover:text-gray-200 transition-colors"
+      >
         <FiX size={18} />
       </button>
     </div>
@@ -53,7 +56,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
   const [notes, setNotes] = useState("");
   const [dicchi, setDicchi] = useState(true); // Default to "Give" (dicchi: true)
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [error, setError] = useState("");
 
@@ -103,14 +106,14 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
         mobileNumber: mobileNumber.trim(),
         amount: parseFloat(amount),
         notes: notes.trim(),
-        dicchi: dicchi
+        dicchi: dicchi,
       };
 
       const response = await axios.post(
-        "https://bebsa-backend.onrender.com/api/transactions",
+        "https://bebsa-backend.vercel.app/api/transactions",
         payload
       );
-      console.log("create Data", response.data)
+      console.log("create Data", response.data);
       if (response.data) {
         onSuccess("Transaction created successfully");
         onClose();
@@ -129,7 +132,9 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-90vh overflow-y-auto animate-fade-in-up">
         <div className="flex justify-between items-center border-b p-4">
-          <h2 className="text-xl font-bold text-gray-800">Create New Customer</h2>
+          <h2 className="text-xl font-bold text-gray-800">
+            Create New Customer
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -148,7 +153,10 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="space-y-4">
             {/* Customer Name */}
             <div className="space-y-2">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Customer Name
               </label>
               <input
@@ -163,7 +171,10 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Mobile Number */}
             <div className="space-y-2">
-              <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="mobileNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Mobile Number
               </label>
               <input
@@ -209,7 +220,10 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Amount */}
             <div className="space-y-2">
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="amount"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Amount
               </label>
               <input
@@ -224,7 +238,10 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Notes */}
             <div className="space-y-2">
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Notes (Optional)
               </label>
               <textarea
@@ -270,7 +287,9 @@ const CreateCustomerModal = ({ isOpen, onClose, onSuccess }) => {
 // UpdateCustomerModal Component
 const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
   const [name, setName] = useState(customer?.customerName || "");
-  const [mobileNumber, setMobileNumber] = useState(customer?.mobileNumber || "");
+  const [mobileNumber, setMobileNumber] = useState(
+    customer?.mobileNumber || ""
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -308,14 +327,14 @@ const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
 
       const payload = {
         name: name.trim(),
-        mobileNumber: mobileNumber.trim()
+        mobileNumber: mobileNumber.trim(),
       };
 
       const response = await axios.put(
-        `https://bebsa-backend.onrender.com/api/transactions/users/${customer._id}`,
+        `https://bebsa-backend.vercel.app/api/transactions/users/${customer._id}`,
         payload
       );
-      
+
       if (response.data) {
         onSuccess("Customer updated successfully");
         onClose();
@@ -353,7 +372,10 @@ const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
           <div className="space-y-4">
             {/* Customer Name */}
             <div className="space-y-2">
-              <label htmlFor="update-name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="update-name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Customer Name
               </label>
               <input
@@ -368,7 +390,10 @@ const UpdateCustomerModal = ({ isOpen, onClose, customer, onSuccess }) => {
 
             {/* Mobile Number */}
             <div className="space-y-2">
-              <label htmlFor="update-mobileNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="update-mobileNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Mobile Number
               </label>
               <input
@@ -421,7 +446,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, customer, onSuccess }) => {
       setError("");
 
       const response = await axios.delete(
-        `https://bebsa-backend.onrender.com/api/transactions/users/${customer._id}`
+        `https://bebsa-backend.vercel.app/api/transactions/users/${customer._id}`
       );
 
       if (response.data) {
@@ -462,9 +487,13 @@ const DeleteConfirmationModal = ({ isOpen, onClose, customer, onSuccess }) => {
             <div className="bg-red-100 text-red-500 p-3 rounded-full inline-block mb-4">
               <FiAlertCircle size={32} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Delete Customer</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Delete Customer
+            </h3>
             <p className="text-gray-600">
-              Are you sure you want to delete <span className="font-medium">{customer?.customerName}</span>? This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <span className="font-medium">{customer?.customerName}</span>?
+              This action cannot be undone.
             </p>
           </div>
 
@@ -559,27 +588,35 @@ const DuePage = () => {
       }
 
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/get-transactions",
+        "https://bebsa-backend.vercel.app/api/get-transactions",
         { params }
       );
 
       // Log the entire response to see its structure
       console.log("Full response:", response.data.totalDueBalance);
       console.log("Response data type:", typeof response.data);
-      setTotalDueAmount(response.data)
+      setTotalDueAmount(response.data);
 
       if (response.data) {
         // Handle different possible response structures
         if (Array.isArray(response.data)) {
           setCustomers(response.data);
-        } else if (response.data.customers && Array.isArray(response.data.customers)) {
+        } else if (
+          response.data.customers &&
+          Array.isArray(response.data.customers)
+        ) {
           setCustomers(response.data.customers);
         } else if (response.data.data && Array.isArray(response.data.data)) {
           setCustomers(response.data.data);
-        } else if (typeof response.data === 'object' && response.data !== null) {
+        } else if (
+          typeof response.data === "object" &&
+          response.data !== null
+        ) {
           // If response.data is an object but not in expected format,
           // try to extract any array property that might contain the customers
-          const possibleArrays = Object.values(response.data).filter(val => Array.isArray(val));
+          const possibleArrays = Object.values(response.data).filter((val) =>
+            Array.isArray(val)
+          );
           if (possibleArrays.length > 0) {
             // Use the first array found
             setCustomers(possibleArrays[0]);
@@ -588,7 +625,6 @@ const DuePage = () => {
             setCustomers([]);
             showToast("Could not find customer data in response", "error");
           }
-       
         } else {
           console.error("Unexpected response format:", response.data);
           setCustomers([]);
@@ -603,7 +639,10 @@ const DuePage = () => {
       console.error("Error fetching customers:", error.response || error);
 
       // More detailed error message
-      const errorMessage = error.response?.data?.message || error.message || "Failed to load customers";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to load customers";
       showToast(errorMessage, "error");
       setCustomers([]);
     } finally {
@@ -634,20 +673,20 @@ const DuePage = () => {
       }
       return total;
     }, 0);
-    
+
     setTotalTake(newTotalTake);
-  }, [customers]);  
+  }, [customers]);
   useEffect(() => {
     const newTotalgive = customers.reduce((total, customer) => {
       // For positive balances (amounts to be received/Pabo)
       if (customer.dueBalance < 0) {
-        return total + (customer.dueBalance* -1);
+        return total + customer.dueBalance * -1;
       }
       return total;
     }, 0);
-    
+
     setTotalGive(newTotalgive);
-  }, [customers]);  
+  }, [customers]);
   // Handle Due button click - updated to use GET request
   const handleDueClick = async (mobileNumber) => {
     try {
@@ -728,7 +767,7 @@ const DuePage = () => {
 
       // Use the same endpoint that works for regular fetch
       const response = await axios.get(
-        "https://bebsa-backend.onrender.com/api/get-transactions"
+        "https://bebsa-backend.vercel.app/api/get-transactions"
       );
 
       console.log("PDF data response:", response.data);
@@ -739,12 +778,20 @@ const DuePage = () => {
       if (response.data) {
         if (Array.isArray(response.data)) {
           customersData = response.data;
-        } else if (response.data.customers && Array.isArray(response.data.customers)) {
+        } else if (
+          response.data.customers &&
+          Array.isArray(response.data.customers)
+        ) {
           customersData = response.data.customers;
         } else if (response.data.data && Array.isArray(response.data.data)) {
           customersData = response.data.data;
-        } else if (typeof response.data === 'object' && response.data !== null) {
-          const possibleArrays = Object.values(response.data).filter(val => Array.isArray(val));
+        } else if (
+          typeof response.data === "object" &&
+          response.data !== null
+        ) {
+          const possibleArrays = Object.values(response.data).filter((val) =>
+            Array.isArray(val)
+          );
           if (possibleArrays.length > 0) {
             customersData = possibleArrays[0];
           } else {
@@ -782,7 +829,7 @@ const DuePage = () => {
       }
 
       // Initialize jsPDF - use portrait orientation
-      const doc = new jsPDF('p', 'mm', 'a4');
+      const doc = new jsPDF("p", "mm", "a4");
       const pageWidth = doc.internal.pageSize.getWidth();
 
       // Add content to PDF
@@ -797,26 +844,39 @@ const DuePage = () => {
       if (totalDueAmount !== undefined) {
         doc.setFontSize(14);
         const totalDueText = `Total Pabo = ${totalTake}`;
-        doc.text(totalDueText, (pageWidth - doc.getTextWidth(totalDueText)) / 2, 40);
+        doc.text(
+          totalDueText,
+          (pageWidth - doc.getTextWidth(totalDueText)) / 2,
+          40
+        );
         doc.setFontSize(14);
         const totalDueTex = `Total dibo = ${totalGive}`;
-        doc.text(totalDueTex, (pageWidth - doc.getTextWidth(totalDueTex)) / 2, 48);
+        doc.text(
+          totalDueTex,
+          (pageWidth - doc.getTextWidth(totalDueTex)) / 2,
+          48
+        );
       }
 
       // Current date
       const date = new Date();
-      const formattedDate = date.getDate().toString().padStart(2, '0') + '/' + 
-                            (date.getMonth() + 1).toString().padStart(2, '0') + '/' + 
-                            date.getFullYear();
+      const formattedDate =
+        date.getDate().toString().padStart(2, "0") +
+        "/" +
+        (date.getMonth() + 1).toString().padStart(2, "0") +
+        "/" +
+        date.getFullYear();
       const currentTime = date.toLocaleTimeString();
       doc.setFontSize(10);
       doc.text(`Date: ${formattedDate} Time: ${currentTime}`, 14, 52);
       // Format customer data for the table
       const tableData = allCustomers.map((customer, index) => [
         index + 1,
-        customer.customerName || '',
-        customer.mobileNumber || '',
-        (customer.dueBalance <0 ? (customer.dueBalance*-1):customer.dueBalance) || '0'  // Added due amount column
+        customer.customerName || "",
+        customer.mobileNumber || "",
+        (customer.dueBalance < 0
+          ? customer.dueBalance * -1
+          : customer.dueBalance) || "0", // Added due amount column
       ]);
 
       // Add the table
@@ -824,14 +884,16 @@ const DuePage = () => {
         startY: 60,
         head: [["S.No", "Customer Name", "Mobile Number", "Due Amount"]],
         body: tableData,
-        theme: 'grid',
+        theme: "grid",
         headStyles: { fillColor: [66, 66, 66] },
         alternateRowStyles: { fillColor: [240, 240, 240] },
         margin: { top: 48 },
       });
 
       // Save the PDF
-      const fileName = `customers_list_${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `customers_list_${
+        new Date().toISOString().split("T")[0]
+      }.pdf`;
       console.log("Attempting to save PDF with filename:", fileName);
 
       doc.save(fileName);
@@ -851,8 +913,6 @@ const DuePage = () => {
     // Open the modal instead of navigating
     setIsCreateModalOpen(true);
   };
-
-
 
   return (
     <div className="bg-gray-50 min-h-screen bg-slate-200">
@@ -882,7 +942,7 @@ const DuePage = () => {
             fetchCustomers();
           }}
         />
-        
+
         <DeleteConfirmationModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
@@ -895,14 +955,16 @@ const DuePage = () => {
 
         <div className="md:flex justify-between items-center mb-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2 ">CUSTOMER DUE</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2 ">
+              CUSTOMER DUE
+            </h1>
             <div className="h-1 w-24 bg-blue-500 mx-auto rounded-full mb-10 md:mb-0"></div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex space-x-3 ml-7 md:ml-0">
             <button
-              onClick={() => navigate('/duehistory')}
+              onClick={() => navigate("/duehistory")}
               className="bg-red-500 py-2 px-4 rounded-lg text-white hover:bg-red-600 transition-colors font-medium shadow-sm flex items-center gap-2"
             >
               {/* <FiPlus size={16} /> */}
@@ -951,8 +1013,14 @@ const DuePage = () => {
 
             <div className="flex flex-col gap-3 justify-end mt-5">
               {/* <h3 className="bg-red-50 py-1 px-5 rounded ">Total Due : <span className="text-red-500 font-bold ">{totalDueAmount.totalDueBalance}</span> </h3> */}
-              <h3 className="bg-red-50 py-1 px-5 rounded ">মোট পাবো : <span className="text-red-500 font-bold ">{totalTake}</span> </h3>
-              <h3 className="bg-green-50 py-1 px-5 rounded ">মোট দিবো : <span className="text-green-500 font-bold ">{totalGive}</span> </h3>
+              <h3 className="bg-red-50 py-1 px-5 rounded ">
+                মোট পাবো :{" "}
+                <span className="text-red-500 font-bold ">{totalTake}</span>{" "}
+              </h3>
+              <h3 className="bg-green-50 py-1 px-5 rounded ">
+                মোট দিবো :{" "}
+                <span className="text-green-500 font-bold ">{totalGive}</span>{" "}
+              </h3>
             </div>
           </div>
 
@@ -990,7 +1058,6 @@ const DuePage = () => {
                   {customers.map((customer, index) => (
                     <tr
                       key={customer._id}
-                    
                       className="border-t border-gray-200 hover:bg-blue-50 transition-colors"
                     >
                       <td className="py-4 px-6">
@@ -1009,19 +1076,22 @@ const DuePage = () => {
                           {customer.mobileNumber}
                         </div>
                       </td>
-                      {(customer.dueBalance<0)?<td className="py-4 px-6 text-green-600 bg-green-50">
-                        <div className="flex items-center gap-2">
-                          {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          YOU WILL GIVE =  {customer.dueBalance *-1}
-                          
-                        </div>
-                      </td>:<td className="py-4 px-6 text-red-600 bg-red-50">
-                        <div className="flex items-center gap-2">
-                          {/* <FiPhone size={16} className="text-gray-400" /> */}
-                          YOU WILL GET =  {customer.dueBalance}
-                        </div>
-                      </td>}
-                      
+                      {customer.dueBalance < 0 ? (
+                        <td className="py-4 px-6 text-green-600 bg-green-50">
+                          <div className="flex items-center gap-2">
+                            {/* <FiPhone size={16} className="text-gray-400" /> */}
+                            YOU WILL GIVE = {customer.dueBalance * -1}
+                          </div>
+                        </td>
+                      ) : (
+                        <td className="py-4 px-6 text-red-600 bg-red-50">
+                          <div className="flex items-center gap-2">
+                            {/* <FiPhone size={16} className="text-gray-400" /> */}
+                            YOU WILL GET = {customer.dueBalance}
+                          </div>
+                        </td>
+                      )}
+
                       <td className="py-4 px-6 text-center">
                         <button
                           className="bg-blue-500 py-2 px-6 rounded-lg text-white hover:bg-blue-600 transition-colors font-medium shadow-sm hover:shadow-md"
@@ -1124,7 +1194,9 @@ const DuePage = () => {
                         <div className="pt-3 flex justify-center">
                           <button
                             className="bg-blue-500 py-2.5 px-6 rounded-lg text-white hover:bg-blue-600 transition-colors w-full font-medium shadow-sm"
-                            onClick={() => handleDueClick(customer.mobileNumber)}
+                            onClick={() =>
+                              handleDueClick(customer.mobileNumber)
+                            }
                           >
                             Due
                           </button>
@@ -1143,7 +1215,6 @@ const DuePage = () => {
                             </button>
                           </div>
                         </div>
-
                       </div>
                     ) : (
                       <div className="mt-2 flex justify-end">
