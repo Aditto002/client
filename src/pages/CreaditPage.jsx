@@ -132,7 +132,7 @@ export default function CreditPage() {
     }
   };
 
-  // Modified to fetch customer suggestions by both name and number
+  // Fetch customer suggestions by name or number
   const fetchCustomerSuggestions = async (searchInput) => {
     if (!searchInput || searchInput.trim() === "") {
       setCustomerSuggestions([]);
@@ -140,52 +140,31 @@ export default function CreditPage() {
       return;
     }
 
+    // Require at least 3 characters for search to avoid getting all customers
+    if (searchInput.trim().length < 3) {
+      setCustomerSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
     try {
-      // First try to search by the input as provided (could be name or number)
+      // Search by the input as provided (API handles both name and number searches)
       const response = await axios.get(
         `https://bebsa-backend.vercel.app/api/customers/search?customer=${encodeURIComponent(
           searchInput
         )}`
       );
 
-      let foundCustomers = [];
       if (response.data && response.data.success) {
-        foundCustomers = response.data.data || [];
+        const foundCustomers = response.data.data || [];
+        // console.log("Search input:", searchInput);
+        // console.log("API response:", foundCustomers);
+        setCustomerSuggestions(foundCustomers);
+        setShowSuggestions(foundCustomers.length > 0);
+      } else {
+        setCustomerSuggestions([]);
+        setShowSuggestions(false);
       }
-
-      // If the search input could be a partial phone number, try to match by mobile number directly
-      // This provides a fallback search method if the API doesn't handle number searches well
-      if (/^\d+$/.test(searchInput)) {
-        // Additional search for numbers only if the input contains only digits
-        try {
-          const numberResponse = await axios.get(
-            `https://bebsa-backend.vercel.app/api/customers/search?mobileNumber=${encodeURIComponent(
-              searchInput
-            )}`
-          );
-
-          if (
-            numberResponse.data &&
-            numberResponse.data.success &&
-            numberResponse.data.data &&
-            numberResponse.data.data.length > 0
-          ) {
-            // Add any new results that weren't already found
-            numberResponse.data.data.forEach((customer) => {
-              if (!foundCustomers.some((c) => c && c._id === customer._id)) {
-                foundCustomers.push(customer);
-              }
-            });
-          }
-        } catch (error) {
-          // Silently continue if the second endpoint doesn't exist
-          console.log("Mobile number specific search not available");
-        }
-      }
-
-      // Set results even if we just have results from the first search
-      setCustomerSuggestions(foundCustomers);
-      setShowSuggestions(foundCustomers.length > 0);
     } catch (error) {
       console.error("Error fetching customer suggestions:", error);
       toast.error("Error searching for customers");
@@ -397,8 +376,9 @@ export default function CreditPage() {
             />
             {showSuggestions && customerSuggestions.length > 0 && (
               <ul className="absolute z-10 w-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-                {customerSuggestions.map((customer) =>
-                  customer && customer._id ? (
+                {customerSuggestions.map((customer, index) => {
+                  console.log(`Dropdown item ${index}:`, customer);
+                  return customer && customer._id ? (
                     <li
                       key={customer._id}
                       className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
@@ -411,8 +391,8 @@ export default function CreditPage() {
                         {customer.mobileNumber || ""}
                       </span>
                     </li>
-                  ) : null
-                )}
+                  ) : null;
+                })}
               </ul>
             )}
           </div>
